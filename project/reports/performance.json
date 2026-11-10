@@ -1,0 +1,54 @@
+{
+  "silver_run_id": "20261110T084021906581Z",
+  "seconds": {
+    "csv": [
+      6.0336,
+      1.038,
+      0.743
+    ],
+    "parquet": [
+      1.4044,
+      0.3758,
+      0.2923
+    ]
+  },
+  "median_seconds": {
+    "csv": 1.038,
+    "parquet": 0.3758
+  },
+  "results_equal": true,
+  "yearly_totals": [
+    [
+      2021,
+      101087,
+      128209,
+      22758
+    ],
+    [
+      2022,
+      106004,
+      135480,
+      24935
+    ],
+    [
+      2023,
+      104258,
+      132977,
+      24960
+    ],
+    [
+      2024,
+      100927,
+      128272,
+      25069
+    ],
+    [
+      2025,
+      101525,
+      127883,
+      26644
+    ]
+  ],
+  "method": "Same three-column aggregation, explicit CSV schema, three alternating trials, no Spark cache",
+  "limitations": "Local VM, warm-up and OS page cache uncontrolled; not a general scalability benchmark"
+}

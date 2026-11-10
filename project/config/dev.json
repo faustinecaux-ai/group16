@@ -1,0 +1,6 @@
+{
+  "bronze": "data/bronze/stats19",
+  "silver": "data/silver/dev",
+  "gold": "data/gold/dev",
+  "pipeline": "data/pipeline/dev"
+}

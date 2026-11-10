@@ -1,0 +1,21 @@
+{
+  "source": "Department for Transport, STATS19 road safety open data",
+  "source_page": "https://www.gov.uk/government/statistical-data-sets/road-safety-open-data",
+  "source_page_checked_on": "2026-11-10",
+  "local_acquisition_date": null,
+  "local_acquisition_note": "Original retrieval time was not recorded. Validation dates are not download dates. Input byte identity is recorded by SHA-256 in Bronze run reports.",
+  "scope": "Police-reported personal injury collisions on public roads in Great Britain",
+  "snapshot_years": [2021, 2022, 2023, 2024, 2025],
+  "refresh": "Final annual data; provisional mid-year releases are separate. This project processes a fixed local snapshot.",
+  "licence": "Open Government Licence v3.0, except where otherwise stated on the source page",
+  "licence_url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+  "attribution": "Contains public sector information licensed under the Open Government Licence v3.0. Source: Department for Transport.",
+  "download_urls_checked_on_source_page": {
+    "collisions": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-collision-last-5-years.csv",
+    "vehicles": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-vehicle-last-5-years.csv",
+    "casualties": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-casualty-last-5-years.csv",
+    "current_reference_guide": "https://assets.publishing.service.gov.uk/media/6ab2a71d997a4b2950cced58/dft-road-casualty-statistics-road-safety-open-dataset-data-guide-2025.xlsx"
+  },
+  "reproducibility_note": "Last-five-years URLs are mutable. Preserve the local raw files externally and compare SHA-256 values. The current guide URL does not establish the download origin of the local guide; its hash identifies the guide actually used.",
+  "severity_guidance": "https://www.gov.uk/government/publications/guide-to-severity-adjustments-for-reported-road-casualty-statistics"
+}

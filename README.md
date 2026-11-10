@@ -1,5 +1,14 @@
 # DAT535
 
+## Road collision course project
+
+The STATS19 project is documented in [project/README.md](project/README.md), with
+[step-by-step instructions](project/GETTING_STARTED.md), an analytical notebook
+and engineering evidence. The files below also retain the course lab material.
+The dev workflow runs STATS19 tests; legacy labs are optional manual jobs.
+The production workflow runs STATS19 on main, including a monthly schedule.
+
+
 ## Spark Lab Pipelines
 
 Spark pipelines for learning distributed data processing.
@@ -130,18 +139,13 @@ The repo contains the automated workflows for the DAT535 project. These workflow
 
 We have configured the following automated processes:
 
-#### Pipeline ([pipeline.yml](.github/workflows/pipeline.yml))
+#### Workflow roles
 
-- **Triggers**:
-  - Scheduled cron job (monthly, 1st of the month at 00:00 UTC: `0 0 1 * *` which can be changed).
-  - Manual dispatch (workflow_dispatch).
-  - Push to `main` is defined in the file but currently commented out.
+- [dat535-dev.yml](.github/workflows/dat535-dev.yml): small STATS19 tests on dev pushes and Pull Requests; optional manual lab execution.
+- [dat535-prod.yml](.github/workflows/dat535-prod.yml): validated STATS19 Bronze-to-Gold execution on main, manually or monthly at 03:00 UTC on day 1.
+- [pipeline.yml](.github/workflows/pipeline.yml): manual legacy lab execution.
 
-- **Key Tasks**:
-  - Checks out the repository code.
-  - Activates the Python environment (`source ~/spark-env/bin/activate`).
-  - Sets environment variables (`SPARK_HOME=/opt/spark`, `JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64`).
-  - Executes all pipelines via `python $GITHUB_WORKSPACE/run_pipeline.py all`.
+See the project README for required input paths, runner settings and evidence status.
 
 ### Infrastructure & Environment Setup
 

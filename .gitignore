@@ -1,0 +1,6 @@
+# Raw STATS19 data - do not commit large source files
+project/data/bronze/stats19/raw/
+
+# Generated Silver and Gold datasets
+project/data/silver/
+project/data/gold/

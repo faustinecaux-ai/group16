@@ -1,0 +1,9 @@
+# Presentation tools. Pipeline transformations use Spark's bundled Python libraries.
+# Tested with Python 3.11, Spark 3.5.0, Java 8 on the course VM.
+# Do not install a separate, mismatched PySpark package for this launcher.
+matplotlib==3.11.1
+pandas==3.0.5
+nbformat==5.11.1
+nbconvert==7.17.1
+ipykernel==7.3.0
+PyYAML==6.0.3

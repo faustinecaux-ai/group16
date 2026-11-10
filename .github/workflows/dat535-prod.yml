@@ -1,61 +1,74 @@
-name: DAT535 — Production Pipeline
+name: DAT535 — STATS19 Production Pipeline
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      lab:
-        description: Lab to run
-        required: true
-        default: all
-        type: choice
-        options: [all, lab2, lab3]
+  
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stats19-production
+  cancel-in-progress: false
 
 jobs:
   deploy-prod:
-    name: Deploy to Production
+    name: Validate and run Bronze to Gold
+    if: github.ref == 'refs/heads/main'
     runs-on: self-hosted
+    timeout-minutes: 30
     environment: main
     env:
-      DAT535_ENV: prod
       SPARK_HOME: /opt/spark
       JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+      STATS19_BRONZE_DIR: ${{ vars.STATS19_BRONZE_DIR || '/home/ubuntu/group16/project/data/bronze/stats19' }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout validated code
         uses: actions/checkout@v7
 
-      - name: Resolve output directory
-        id: output-dir
-        # Persistent, non-tmp path: survives runner reboots/tmpfiles cleanup, unlike /tmp
-        run: echo "dir=$HOME/spark-lab-data/prod" >> "$GITHUB_OUTPUT"
+      - name: Resolve persistent output directory
+        id: paths
+        shell: bash
+        run: printf 'root=%s\n' "$HOME/stats19-pipeline/prod" >> "$GITHUB_OUTPUT"
 
-      - name: Run Production Pipeline
-        env:
-          DAT535_OUTPUT_DIR: ${{ steps.output-dir.outputs.dir }}
+      - name: Run small pipeline tests
+        shell: bash
         run: |
-          source ~/spark-env/bin/activate
-          mkdir -p "$DAT535_OUTPUT_DIR"
-          
-          LAB_TO_RUN="${{ github.event.inputs.lab || 'all' }}"
-          echo "=== Running Production Pipeline ($LAB_TO_RUN) ==="
-          python $GITHUB_WORKSPACE/run_pipeline.py $LAB_TO_RUN
+          set -euo pipefail
+          bash project/scripts/run_tests.sh 2>&1 | tee "$RUNNER_TEMP/stats19-tests.log"
 
-      - name: Upload Production artifacts
+      - name: Run Bronze to Silver to Gold
+        shell: bash
+        env:
+          STATS19_OUTPUT_ROOT: ${{ steps.paths.outputs.root }}
+        run: |
+          set -euo pipefail
+          bash project/scripts/run_project.sh --env prod \
+            --bronze "$STATS19_BRONZE_DIR" --output-root "$STATS19_OUTPUT_ROOT" \
+            2>&1 | tee "$RUNNER_TEMP/stats19-pipeline.log"
+
+      - name: Build analytical figures and summary
+        shell: bash
+        env:
+          STATS19_OUTPUT_ROOT: ${{ steps.paths.outputs.root }}
+        run: |
+          source "$HOME/spark-env/bin/activate"
+          python project/scripts/render_results.py --env prod \
+            --gold "$STATS19_OUTPUT_ROOT/gold" --output "$STATS19_OUTPUT_ROOT/presentation"
+          head -n 7 "$STATS19_OUTPUT_ROOT/presentation/results.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload run evidence
+        if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: prod-outputs-${{ github.run_number }}
-          path: ${{ steps.output-dir.outputs.dir }}/
+          name: stats19-production-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/stats19-tests.log
+            ${{ runner.temp }}/stats19-pipeline.log
+            ${{ steps.paths.outputs.root }}/pipeline/runs/**/quality_report.json
+            ${{ steps.paths.outputs.root }}/presentation/
           retention-days: 30
-          if-no-files-found: ignore
-
-      - name: Write pipeline summary
-        run: |
-          echo "## Production Pipeline Run" >> $GITHUB_STEP_SUMMARY
-          echo "| Key | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Run # | ${{ github.run_number }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Lab | ${{ github.event.inputs.lab || 'all' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Triggered by | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Branch | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          if-no-files-found: warn

@@ -4,11 +4,54 @@ on:
   push:
     branches: [dev]
   pull_request:
-    branches: [dev]
+    branches: [dev, main]
   workflow_dispatch:
+    inputs:
+      run_labs:
+        description: Also run the legacy course labs
+        type: boolean
+        default: false
 
 jobs:
+  silver-tests:
+    name: STATS19 pipeline tests
+    if: >
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: self-hosted
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    concurrency:
+      group: silver-tests-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
+    env:
+      SPARK_HOME: /opt/spark
+      JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Run small Silver tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash project/scripts/run_tests.sh 2>&1 | tee "$RUNNER_TEMP/stats19-silver-tests.log"
+
+      - name: Upload test log
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: silver-test-log-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/stats19-silver-tests.log
+          retention-days: 7
+          if-no-files-found: warn
+
   run-dev:
+    # Preserve the course labs as an optional manual job.
+    if: github.event_name == 'workflow_dispatch' && inputs.run_labs
+    needs: silver-tests
     name: Run Dev Pipeline
     runs-on: self-hosted
     environment: dev
