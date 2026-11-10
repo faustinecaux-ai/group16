@@ -1,0 +1,36 @@
+{
+  "source": "UK Department for Transport - STATS19",
+  "source_url": "https://www.gov.uk/government/statistical-data-sets/road-safety-open-data",
+  "validation_date": "2026-10-28T09:50:39.538692",
+  "format": "CSV",
+  "bronze_policy": {
+    "raw_files_preserved": true,
+    "raw_files_modified": false,
+    "duplicate_prevention": "Deterministic file paths and SHA-256 checksums",
+    "schema_tracking": "Source CSV headers stored in schema_snapshot.json"
+  },
+  "datasets": [
+    {
+      "name": "collisions",
+      "file": "raw/collisions/collisions_last5years.csv",
+      "size_bytes": 97669586,
+      "sha256": "06a03c0e5504175e23ed98e3e0b4767ac61d396c073405a1bddab9339c18f948",
+      "status": "new_or_changed"
+    },
+    {
+      "name": "vehicles",
+      "file": "raw/vehicles/vehicles_last5years.csv",
+      "size_bytes": 103741631,
+      "sha256": "05453dca2651ad8a27b4ac0e6a0450a852c506e4d495111ffca398f3d311e26a",
+      "status": "new_or_changed"
+    },
+    {
+      "name": "casualties",
+      "file": "raw/casualties/casualties_last5years.csv",
+      "size_bytes": 53685509,
+      "sha256": "870be5a934ae10baf5c52163d59eccba0ab2f40327ffa6b2bd354d2e7ee6b108",
+      "status": "new_or_changed"
+    }
+  ],
+  "reference_file": "reference/stats19_data_guide.xlsx"
+}

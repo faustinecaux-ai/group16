@@ -1,0 +1,75 @@
+== Physical Plan ==
+AdaptiveSparkPlan (11)
++- == Final Plan ==
+   * HashAggregate (7)
+   +- AQEShuffleRead (6)
+      +- ShuffleQueryStage (5), Statistics(sizeInBytes=400.0 B, rowCount=10)
+         +- Exchange (4)
+            +- * HashAggregate (3)
+               +- * ColumnarToRow (2)
+                  +- Scan parquet  (1)
++- == Initial Plan ==
+   HashAggregate (10)
+   +- Exchange (9)
+      +- HashAggregate (8)
+         +- Scan parquet  (1)
+
+
+(1) Scan parquet 
+Output [3]: [collision_year#119, collision_severity#126, number_of_casualties#128]
+Batched: true
+Location: InMemoryFileIndex [file:/home/ubuntu/group16/project/data/silver/dev/runs/20261110T084021906581Z/collisions]
+ReadSchema: struct<collision_year:int,collision_severity:int,number_of_casualties:int>
+
+(2) ColumnarToRow [codegen id : 1]
+Input [3]: [collision_year#119, collision_severity#126, number_of_casualties#128]
+
+(3) HashAggregate [codegen id : 1]
+Input [3]: [collision_year#119, collision_severity#126, number_of_casualties#128]
+Keys [1]: [collision_year#119]
+Functions [3]: [partial_count(1), partial_sum(number_of_casualties#128), partial_sum(cast(collision_severity#126 IN (1,2) as bigint))]
+Aggregate Attributes [3]: [count#243L, sum#244L, sum#245L]
+Results [4]: [collision_year#119, count#246L, sum#247L, sum#248L]
+
+(4) Exchange
+Input [4]: [collision_year#119, count#246L, sum#247L, sum#248L]
+Arguments: hashpartitioning(collision_year#119, 8), ENSURE_REQUIREMENTS, [plan_id=61]
+
+(5) ShuffleQueryStage
+Output [4]: [collision_year#119, count#246L, sum#247L, sum#248L]
+Arguments: 0
+
+(6) AQEShuffleRead
+Input [4]: [collision_year#119, count#246L, sum#247L, sum#248L]
+Arguments: coalesced
+
+(7) HashAggregate [codegen id : 2]
+Input [4]: [collision_year#119, count#246L, sum#247L, sum#248L]
+Keys [1]: [collision_year#119]
+Functions [3]: [count(1), sum(number_of_casualties#128), sum(cast(collision_severity#126 IN (1,2) as bigint))]
+Aggregate Attributes [3]: [count(1)#233L, sum(number_of_casualties#128)#235L, sum(cast(collision_severity#126 IN (1,2) as bigint))#237L]
+Results [4]: [collision_year#119, count(1)#233L AS collisions#234L, sum(number_of_casualties#128)#235L AS casualties#236L, sum(cast(collision_severity#126 IN (1,2) as bigint))#237L AS fatal_or_serious#238L]
+
+(8) HashAggregate
+Input [3]: [collision_year#119, collision_severity#126, number_of_casualties#128]
+Keys [1]: [collision_year#119]
+Functions [3]: [partial_count(1), partial_sum(number_of_casualties#128), partial_sum(cast(collision_severity#126 IN (1,2) as bigint))]
+Aggregate Attributes [3]: [count#243L, sum#244L, sum#245L]
+Results [4]: [collision_year#119, count#246L, sum#247L, sum#248L]
+
+(9) Exchange
+Input [4]: [collision_year#119, count#246L, sum#247L, sum#248L]
+Arguments: hashpartitioning(collision_year#119, 8), ENSURE_REQUIREMENTS, [plan_id=47]
+
+(10) HashAggregate
+Input [4]: [collision_year#119, count#246L, sum#247L, sum#248L]
+Keys [1]: [collision_year#119]
+Functions [3]: [count(1), sum(number_of_casualties#128), sum(cast(collision_severity#126 IN (1,2) as bigint))]
+Aggregate Attributes [3]: [count(1)#233L, sum(number_of_casualties#128)#235L, sum(cast(collision_severity#126 IN (1,2) as bigint))#237L]
+Results [4]: [collision_year#119, count(1)#233L AS collisions#234L, sum(number_of_casualties#128)#235L AS casualties#236L, sum(cast(collision_severity#126 IN (1,2) as bigint))#237L AS fatal_or_serious#238L]
+
+(11) AdaptiveSparkPlan
+Output [4]: [collision_year#119, collisions#234L, casualties#236L, fatal_or_serious#238L]
+Arguments: isFinalPlan=true
+
+

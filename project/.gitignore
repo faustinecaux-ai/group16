@@ -1,0 +1,4 @@
+# Python generates these files when importing the Silver helpers.
+__pycache__/
+*.pyc
+data/pipeline/
