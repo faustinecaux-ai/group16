@@ -13,11 +13,11 @@ The analytical question is: **Which lighting, road-type and speed-limit profiles
 | Evidence | Location |
 |---|---|
 | Engineering report | [Six-page PDF](reports/pdf/report.pdf), with [LaTeX source and build instructions](reports/pdf/README.md) |
-| Silver validation | [Versioned JSON report](reports/silver_quality.json) and [quality notes](silver_quality_notes.md) |
+| Silver validation | [Versioned JSON report](reports/silver_quality.json) and [layer design](#layer-design) |
 | Analysis | [Executed notebook](notebooks/analysis.ipynb), [results and figures](reports/results.md), [machine-readable summary](reports/results.json) |
 | Performance | [Measured trials](reports/performance.json), [CSV plan](reports/csv_plan.txt), [Parquet plan](reports/parquet_plan.txt) |
 | Design | [Project definition](project_definition.md) |
-| Reproduction | [Execution guide](GETTING_STARTED.md), scripts and environment configuration |
+| Reproduction | [Reproduction commands](#reproduction-commands), scripts and environment configuration |
 
 The reference development run is `20261110T150552746288Z`: Bronze, Silver and Gold passed in 81.37 seconds. The saved suite records 17 successful tests. A retained production-directory manifest identifies passed run `20261110T180208676518Z` (74.00 seconds). These are recorded execution measurements, rather than performance guarantees. The production manifest alone does not identify its triggering GitHub event or establish environment approvals.
 
@@ -37,7 +37,7 @@ Source identifiers remain textual, dates are parsed and calendar fields derived.
 
 Vehicles and casualties are aggregated independently before joining to collisions. This prevents a vehicle-by-casualty cross-product and preserves one row per enriched collision. Checks cover missing/duplicate keys, important fields, date/time parsing, calendar consistency, coordinate ranges, mapping coverage, foreign keys, parent/child years and declared versus observed child counts. Parquet outputs are reloaded to compare counts and data types.
 
-The reference run retains every source row. It records 142,240 missing driver-age codes, 14,106 missing casualty-age codes, 53 missing longitudes and 53 missing latitudes, and three missing speed limits. Missing attributes are measured without deleting otherwise useful records. The [Silver notes](silver_quality_notes.md) explain their interpretation.
+The reference run retains every source row. It records 142,240 missing driver-age codes, 14,106 missing casualty-age codes, 53 missing longitudes and 53 missing latitudes, and three missing speed limits. Missing attributes are measured without deleting otherwise useful records. The [project report](reports/pdf/report.pdf) explains these decisions. Age averages use only non-missing clean ages and require their own known-age denominator.
 
 **Gold** publishes ten summaries as small Parquet and CSV tables: pooled collision profiles, annual profiles, monthly, hourly, weather, lighting, road type, speed limit, weekend and vehicle type. Exclusive summaries reconcile to Silver; annual profiles also reconcile by year. Vehicle memberships count a collision once per type but overlap across types. Profiles compare severe-case counts, within-profile severity and shares of recorded populations. Unknown groups remain represented.
 

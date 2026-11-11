@@ -13,7 +13,6 @@ This repository presents a PySpark Bronze → Silver → Gold pipeline for polic
 | [Project documentation](project/README.md) | Implementation, evidence and reproduction requirements |
 | [Executed notebook](project/notebooks/analysis.ipynb) | Analytical tables, figures and interpretation |
 | [Silver quality evidence](project/reports/silver_quality.json) | Recorded counts, schemas, missing values, relationship checks and Parquet validation |
-| [Silver quality notes](project/silver_quality_notes.md) | Interpretation of the reference run and cleaning decisions |
 | [Analytical results](project/reports/results.md) | Ranked profiles, denominator definitions and annual checks |
 | [Performance evidence](project/reports/performance.json) | Measured CSV/Parquet comparison and [saved plans](project/reports/parquet_plan.txt) |
 | [Project definition](project/project_definition.md) | Scope, analytical question and design objectives |
@@ -48,7 +47,7 @@ cd project
 bash scripts/run_tests.sh
 ```
 
-Full processing additionally requires the three externally retained CSVs at the paths documented in the [source setup](project/README.md#source-data-and-environment). Raw and generated layer datasets are excluded from Git. The PDF, executed notebook and exported evidence can be inspected without processing the raw snapshot. [Reproduction instructions](project/GETTING_STARTED.md) describe the complete commands and path overrides.
+Full processing additionally requires the three externally retained CSVs at the paths documented in the [source setup](project/README.md#source-data-and-environment). Raw and generated layer datasets are excluded from Git. The PDF, executed notebook and exported evidence can be inspected without processing the raw snapshot. [Reproduction instructions](project/README.md#reproduction-commands) describe the complete commands and path overrides.
 
 The development workflow runs small tests on `dev` pushes, same-repository pull requests targeting `dev`/`main`, and manual dispatch. Production runs tests and the full pipeline on `main` pushes or manual dispatch using the VM snapshot. No periodic schedule is currently enabled. A retained production manifest records a successful run; GitHub protection and approval settings are separate from the versioned workflow definitions.
 
