@@ -1,5 +1,7 @@
 # DAT535
 
+[Read the five-page project report (PDF)](project/reports/pdf/report.pdf) · [LaTeX source](project/reports/pdf/report.tex)
+
 ## Road collision course project
 
 The STATS19 project is documented in [project/README.md](project/README.md), with

@@ -1,5 +1,7 @@
 # DAT535 — STATS19 Road Collision Pipeline
 
+[Read the five-page project report (PDF)](reports/pdf/report.pdf) · [LaTeX source](reports/pdf/report.tex)
+
 A reproducible PySpark batch pipeline for police-reported personal injury collisions in Great Britain, following **Bronze → Silver → Gold**. The local snapshot covers 2021–2025. The pipeline, small-data tests, analytical notebook and local execution evidence are available. GitHub workflows are configured but their first remote execution remains to be demonstrated after pushing and reviewing the code.
 
 Start with [Getting Started](GETTING_STARTED.md). See the [project definition](project_definition.md), [engineering report](reports/project_report.md), [analytical results](reports/results.md), [Silver quality notes](silver_quality_notes.md) and [notebook](notebooks/analysis.ipynb).
