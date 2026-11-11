@@ -1,4 +1,6 @@
-# Project — CI/CD Pipelines: Dev/Prod with GitHub Actions
+# Course labs — CI/CD setup guide (legacy)
+
+> This retained course guide describes the original lab exercises and example runner setup. The STATS19 implementation is documented in [project/README.md](project/README.md#performance-and-cicd). Its production outputs use `$HOME/stats19-pipeline/prod`, and its development workflow primarily runs fixture tests. Approval steps below are configuration instructions, not evidence that repository protections are enabled. Current triggers and commands are defined in the versioned workflows.
 
 ## Learning Objectives
 

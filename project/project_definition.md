@@ -48,6 +48,6 @@ Define each table's grain, denominator and treatment of unknown values. Reconcil
 
 Provide a documented Bronze → Silver → quality checks → Gold command, compatible dependencies and separate development/production output settings. Use notebooks for exploration and presentation, and Python modules or scripts for reusable logic. Another engineer should be able to configure and run the pipeline.
 
-Develop on `dev` and use GitHub Actions on the VM runner to test representative small fixtures and reference data. Check changes and Pull Requests to `main`; review and merge validated code before controlled execution on the VM. Demonstrate a scheduled end-to-end run on the local snapshot without assuming that each run requires new data or a download.
+Develop on `dev` and use GitHub Actions on the VM runner to test representative small fixtures and reference data. Check changes and Pull Requests to `main`; review and merge validated code before controlled execution on the VM. Scheduled end-to-end execution on the local snapshot was an initial lifecycle objective. The delivered workflow runs on pushes to `main` and manual dispatch; periodic scheduling is not enabled. Neither trigger implies new input data or an automatic download.
 
 Keep logs, run status, rejected-record information and quality reports visible. The project group owns failure review and update validation. The report will explain engineering decisions, measured results, limitations and reflection, supported by tests, quality metrics, execution evidence and performance analysis.

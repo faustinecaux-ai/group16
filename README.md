@@ -36,7 +36,7 @@ project/
 .github/workflows/    # STATS19 checks and production execution; manual legacy labs
 ```
 
-The root-level lab notebooks and `lab*_pipeline.py` / `run_pipeline.py` scripts are retained course exercises. The assessed STATS19 implementation is under `project/`.
+The root-level lab notebooks, `lab*_pipeline.py` / `run_pipeline.py` scripts and [legacy CI/CD guide](project_cicd_guide.md) are retained course exercises. The assessed STATS19 implementation is under `project/`.
 
 ## Reproduction and execution
 
