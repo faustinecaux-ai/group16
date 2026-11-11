@@ -2,9 +2,9 @@
 
 ## Run evidence
 
-Run: `20261110T080247399254Z` (10 November 2026), Spark 3.5.0. Observed execution time: 58.93 seconds. Full report: `data/silver/runs/20261110T080247399254Z/quality_report.json`.
+Run: `20261110T150552746288Z` (10 November 2026), Spark 3.5.0. Observed execution time: 59.49 seconds. Full report: [versioned Silver JSON report](reports/silver_quality.json).
 
-Generated outputs remain local and are excluded from Git. This note preserves a summary of the measurements and their interpretation. It describes this specific run and is not regenerated automatically; every Silver run creates its own JSON report.
+Generated datasets remain local and are excluded from Git. The small JSON quality report is versioned as assessment evidence; this note explains its measurements. It describes this specific run and is not regenerated automatically; every Silver run creates its own JSON report.
 
 ## Missing-age handling
 
@@ -37,8 +37,17 @@ Zero remains a valid casualty age. No arbitrary upper limit was applied. The obs
 - No unrecognised codes in the seven categorical fields being decoded.
 - Parquet row counts match after reloading the outputs.
 
-`passed` means the implemented checks succeeded. It does not establish that every possible issue has been investigated or that the source is exhaustive. Missing coordinates are retained for analyses that do not depend on location. Seven small Spark tests passed, including age handling and missing-value checks. The observed duration is not evidence of a performance improvement.
+`passed` means the implemented checks succeeded. It does not establish that every possible issue has been investigated or that the source is exhaustive. Missing coordinates are retained for analyses that do not depend on location. The saved suite records 17 successful tests, including age handling, relationship-safe enrichment, annual denominators and failed-update publication. The observed duration is not evidence of a performance improvement.
 
-## Further validation
+## Scope of validation
 
-Review speed-limit codes, complete input provenance, strengthen tests for aggregation and publication behaviour, and inspect execution plans before building Gold. The CI workflow is configured to run the small tests once its files are pushed to GitHub; it does not process the large CSVs on each change.
+Three speed limits are coded missing; no unsupported speed values were found.
+Pooled and annual Gold summaries reconcile to Silver. The end-to-end fixture test
+also verifies that an inconsistent update blocks Gold and preserves previous
+validated Silver and Gold pointers. The pipeline manifest is the reference for
+consistent end-to-end consumption because pointers are published per layer.
+
+Source retrieval dates remain unknown. Numeric schemas are inferred, the guide
+reader depends on its selected workbook layout, and global coordinate ranges do
+not prove geographic accuracy. These are documented limits of the current
+snapshot, rather than additional claims of validation.

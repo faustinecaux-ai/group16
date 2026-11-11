@@ -1,0 +1,1600 @@
+{
+  "run_id": "20261110T150552746288Z",
+  "status": "passed",
+  "tables": {
+    "collisions": {
+      "rows": 513801,
+      "missing_keys": 0,
+      "duplicate_key_excess": 0,
+      "input_schema": {
+        "type": "struct",
+        "fields": [
+          {
+            "name": "collision_index",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_year",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_ref_no",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "location_easting_osgr",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "location_northing_osgr",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "longitude",
+            "type": "double",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "latitude",
+            "type": "double",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "police_force",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_severity",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "number_of_vehicles",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "number_of_casualties",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "date",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "day_of_week",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "time",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "local_authority_district",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "local_authority_ons_district",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "local_authority_highway",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "local_authority_highway_current",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "first_road_class",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "first_road_number",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "road_type",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "speed_limit",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "junction_detail_historic",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "junction_detail",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "junction_control",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "second_road_class",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "second_road_number",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "pedestrian_crossing_human_control_historic",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "pedestrian_crossing_physical_facilities_historic",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "pedestrian_crossing",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "light_conditions",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "weather_conditions",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "road_surface_conditions",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "special_conditions_at_site",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "carriageway_hazards_historic",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "carriageway_hazards",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "urban_or_rural_area",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "did_police_officer_attend_scene_of_accident",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "trunk_road_flag",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "lsoa_of_accident_location",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "enhanced_severity_collision",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_injury_based",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_adjusted_severity_serious",
+            "type": "double",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_adjusted_severity_slight",
+            "type": "double",
+            "nullable": true,
+            "metadata": {}
+          }
+        ]
+      },
+      "missing_important_fields": {
+        "collision_year": 0,
+        "date": 0,
+        "time": 0,
+        "collision_severity": 0,
+        "longitude": 53,
+        "latitude": 53,
+        "speed_limit": 0,
+        "number_of_vehicles": 0,
+        "number_of_casualties": 0
+      },
+      "years": {
+        "2025": 101525,
+        "2023": 104258,
+        "2022": 106004,
+        "2021": 101087,
+        "2024": 100927
+      },
+      "speed_limit_quality": {
+        "coded_missing_or_unknown": 3,
+        "unrecognised_values": 0,
+        "clean_nulls": 3
+      },
+      "date_parse_failures": 0,
+      "missing_or_unusable_time": 0,
+      "time_parse_failures": 0,
+      "year_mismatches": 0,
+      "weekday_mismatches": 0,
+      "out_of_range_coordinates": 0,
+      "unmapped_categories": {
+        "collision_severity": [],
+        "weather_conditions": [],
+        "light_conditions": [],
+        "road_surface_conditions": [],
+        "road_type": []
+      },
+      "output_rows": 513801,
+      "output_schema": {
+        "type": "struct",
+        "fields": [
+          {
+            "name": "collision_index",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_year",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_ref_no",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "location_easting_osgr",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "location_northing_osgr",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "longitude",
+            "type": "double",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "latitude",
+            "type": "double",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "police_force",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_severity",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "number_of_vehicles",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "number_of_casualties",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "date",
+            "type": "date",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "day_of_week",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "time",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "local_authority_district",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "local_authority_ons_district",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "local_authority_highway",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "local_authority_highway_current",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "first_road_class",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "first_road_number",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "road_type",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "speed_limit",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "junction_detail_historic",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "junction_detail",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "junction_control",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "second_road_class",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "second_road_number",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "pedestrian_crossing_human_control_historic",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "pedestrian_crossing_physical_facilities_historic",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "pedestrian_crossing",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "light_conditions",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "weather_conditions",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "road_surface_conditions",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "special_conditions_at_site",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "carriageway_hazards_historic",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "carriageway_hazards",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "urban_or_rural_area",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "did_police_officer_attend_scene_of_accident",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "trunk_road_flag",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "lsoa_of_accident_location",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "enhanced_severity_collision",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_injury_based",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_adjusted_severity_serious",
+            "type": "double",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_adjusted_severity_slight",
+            "type": "double",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "date_source",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "hour",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "month",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "is_weekend",
+            "type": "boolean",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "speed_limit_mph_clean",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_severity_label",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "weather_conditions_label",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "light_conditions_label",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "road_surface_conditions_label",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "road_type_label",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          }
+        ]
+      }
+    },
+    "vehicles": {
+      "rows": 937265,
+      "missing_keys": 0,
+      "duplicate_key_excess": 0,
+      "input_schema": {
+        "type": "struct",
+        "fields": [
+          {
+            "name": "collision_index",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_year",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_ref_no",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_reference",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_type",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "towing_and_articulation",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_manoeuvre_historic",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_manoeuvre",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_direction_from",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_direction_to",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_location_restricted_lane_historic",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_location_restricted_lane",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "junction_location",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "skidding_and_overturning",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "hit_object_in_carriageway",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_leaving_carriageway",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "hit_object_off_carriageway",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "first_point_of_impact",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_left_hand_drive",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "journey_purpose_of_driver_historic",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "journey_purpose_of_driver",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "sex_of_driver",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "age_of_driver",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "age_band_of_driver",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "engine_capacity_cc",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "propulsion_code",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "age_of_vehicle",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "generic_make_model",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "driver_imd_decile",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "lsoa_of_driver",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "escooter_flag",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "driver_distance_banding",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          }
+        ]
+      },
+      "missing_important_fields": {
+        "collision_year": 0,
+        "vehicle_type": 0,
+        "age_of_driver": 0
+      },
+      "years": {
+        "2022": 193545,
+        "2023": 189815,
+        "2025": 183948,
+        "2021": 186443,
+        "2024": 183514
+      },
+      "age_quality": {
+        "source_missing_or_out_of_range_code": 142240,
+        "unexpected_negative_values": 0,
+        "source_nulls": 0,
+        "clean_nulls": 142240,
+        "minimum_recorded_age": 1,
+        "maximum_recorded_age": 105
+      },
+      "unmapped_categories": {
+        "vehicle_type": []
+      },
+      "output_rows": 937265,
+      "output_schema": {
+        "type": "struct",
+        "fields": [
+          {
+            "name": "collision_index",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_year",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_ref_no",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_reference",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_type",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "towing_and_articulation",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_manoeuvre_historic",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_manoeuvre",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_direction_from",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_direction_to",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_location_restricted_lane_historic",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_location_restricted_lane",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "junction_location",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "skidding_and_overturning",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "hit_object_in_carriageway",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_leaving_carriageway",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "hit_object_off_carriageway",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "first_point_of_impact",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_left_hand_drive",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "journey_purpose_of_driver_historic",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "journey_purpose_of_driver",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "sex_of_driver",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "age_of_driver",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "age_band_of_driver",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "engine_capacity_cc",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "propulsion_code",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "age_of_vehicle",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "generic_make_model",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "driver_imd_decile",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "lsoa_of_driver",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "escooter_flag",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "driver_distance_banding",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "age_of_driver_clean",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_type_label",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          }
+        ]
+      }
+    },
+    "casualties": {
+      "rows": 652821,
+      "missing_keys": 0,
+      "duplicate_key_excess": 0,
+      "input_schema": {
+        "type": "struct",
+        "fields": [
+          {
+            "name": "collision_index",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_year",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_ref_no",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_reference",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_reference",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_class",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "sex_of_casualty",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "age_of_casualty",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "age_band_of_casualty",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_severity",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "pedestrian_location",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "pedestrian_movement",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "car_passenger",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "bus_or_coach_passenger",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "pedestrian_road_maintenance_worker",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_type",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_imd_decile",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "lsoa_of_casualty",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "enhanced_casualty_severity",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_injury_based",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_adjusted_severity_serious",
+            "type": "double",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_adjusted_severity_slight",
+            "type": "double",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_distance_banding",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "escooter_flag",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          }
+        ]
+      },
+      "missing_important_fields": {
+        "collision_year": 0,
+        "vehicle_reference": 0,
+        "casualty_severity": 0,
+        "age_of_casualty": 0
+      },
+      "years": {
+        "2022": 135480,
+        "2023": 132977,
+        "2025": 127883,
+        "2021": 128209,
+        "2024": 128272
+      },
+      "age_quality": {
+        "source_missing_or_out_of_range_code": 14106,
+        "unexpected_negative_values": 0,
+        "source_nulls": 0,
+        "clean_nulls": 14106,
+        "minimum_recorded_age": 0,
+        "maximum_recorded_age": 105
+      },
+      "unmapped_categories": {
+        "casualty_severity": []
+      },
+      "output_rows": 652821,
+      "output_schema": {
+        "type": "struct",
+        "fields": [
+          {
+            "name": "collision_index",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_year",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "collision_ref_no",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "vehicle_reference",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_reference",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_class",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "sex_of_casualty",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "age_of_casualty",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "age_band_of_casualty",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_severity",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "pedestrian_location",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "pedestrian_movement",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "car_passenger",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "bus_or_coach_passenger",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "pedestrian_road_maintenance_worker",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_type",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_imd_decile",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "lsoa_of_casualty",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "enhanced_casualty_severity",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_injury_based",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_adjusted_severity_serious",
+            "type": "double",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_adjusted_severity_slight",
+            "type": "double",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_distance_banding",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "escooter_flag",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "age_of_casualty_clean",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "casualty_severity_label",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          }
+        ]
+      }
+    }
+  },
+  "relationships": {
+    "vehicles_without_collision": 0,
+    "vehicles_year_mismatches": 0,
+    "casualties_without_collision": 0,
+    "casualties_year_mismatches": 0,
+    "casualties_without_vehicle": 0,
+    "observed_vehicle_count_mismatches": 0,
+    "observed_casualty_count_mismatches": 0
+  },
+  "rejected_rows": 0,
+  "policy": "No rows deleted; unknown source codes preserved.",
+  "spark_version": "3.5.0",
+  "input_manifest": {
+    "run_id": "20261110T150552746288Z",
+    "status": "passed",
+    "source_url": "https://www.gov.uk/government/statistical-data-sets/road-safety-open-data",
+    "datasets": [
+      {
+        "name": "collisions",
+        "file": "raw/collisions/collisions_last5years.csv",
+        "size_bytes": 97669586,
+        "sha256": "06a03c0e5504175e23ed98e3e0b4767ac61d396c073405a1bddab9339c18f948",
+        "columns": [
+          "collision_index",
+          "collision_year",
+          "collision_ref_no",
+          "location_easting_osgr",
+          "location_northing_osgr",
+          "longitude",
+          "latitude",
+          "police_force",
+          "collision_severity",
+          "number_of_vehicles",
+          "number_of_casualties",
+          "date",
+          "day_of_week",
+          "time",
+          "local_authority_district",
+          "local_authority_ons_district",
+          "local_authority_highway",
+          "local_authority_highway_current",
+          "first_road_class",
+          "first_road_number",
+          "road_type",
+          "speed_limit",
+          "junction_detail_historic",
+          "junction_detail",
+          "junction_control",
+          "second_road_class",
+          "second_road_number",
+          "pedestrian_crossing_human_control_historic",
+          "pedestrian_crossing_physical_facilities_historic",
+          "pedestrian_crossing",
+          "light_conditions",
+          "weather_conditions",
+          "road_surface_conditions",
+          "special_conditions_at_site",
+          "carriageway_hazards_historic",
+          "carriageway_hazards",
+          "urban_or_rural_area",
+          "did_police_officer_attend_scene_of_accident",
+          "trunk_road_flag",
+          "lsoa_of_accident_location",
+          "enhanced_severity_collision",
+          "collision_injury_based",
+          "collision_adjusted_severity_serious",
+          "collision_adjusted_severity_slight"
+        ],
+        "column_count": 44,
+        "change_status": "unchanged"
+      },
+      {
+        "name": "vehicles",
+        "file": "raw/vehicles/vehicles_last5years.csv",
+        "size_bytes": 103741631,
+        "sha256": "05453dca2651ad8a27b4ac0e6a0450a852c506e4d495111ffca398f3d311e26a",
+        "columns": [
+          "collision_index",
+          "collision_year",
+          "collision_ref_no",
+          "vehicle_reference",
+          "vehicle_type",
+          "towing_and_articulation",
+          "vehicle_manoeuvre_historic",
+          "vehicle_manoeuvre",
+          "vehicle_direction_from",
+          "vehicle_direction_to",
+          "vehicle_location_restricted_lane_historic",
+          "vehicle_location_restricted_lane",
+          "junction_location",
+          "skidding_and_overturning",
+          "hit_object_in_carriageway",
+          "vehicle_leaving_carriageway",
+          "hit_object_off_carriageway",
+          "first_point_of_impact",
+          "vehicle_left_hand_drive",
+          "journey_purpose_of_driver_historic",
+          "journey_purpose_of_driver",
+          "sex_of_driver",
+          "age_of_driver",
+          "age_band_of_driver",
+          "engine_capacity_cc",
+          "propulsion_code",
+          "age_of_vehicle",
+          "generic_make_model",
+          "driver_imd_decile",
+          "lsoa_of_driver",
+          "escooter_flag",
+          "driver_distance_banding"
+        ],
+        "column_count": 32,
+        "change_status": "unchanged"
+      },
+      {
+        "name": "casualties",
+        "file": "raw/casualties/casualties_last5years.csv",
+        "size_bytes": 53685509,
+        "sha256": "870be5a934ae10baf5c52163d59eccba0ab2f40327ffa6b2bd354d2e7ee6b108",
+        "columns": [
+          "collision_index",
+          "collision_year",
+          "collision_ref_no",
+          "vehicle_reference",
+          "casualty_reference",
+          "casualty_class",
+          "sex_of_casualty",
+          "age_of_casualty",
+          "age_band_of_casualty",
+          "casualty_severity",
+          "pedestrian_location",
+          "pedestrian_movement",
+          "car_passenger",
+          "bus_or_coach_passenger",
+          "pedestrian_road_maintenance_worker",
+          "casualty_type",
+          "casualty_imd_decile",
+          "lsoa_of_casualty",
+          "enhanced_casualty_severity",
+          "casualty_injury_based",
+          "casualty_adjusted_severity_serious",
+          "casualty_adjusted_severity_slight",
+          "casualty_distance_banding",
+          "escooter_flag"
+        ],
+        "column_count": 24,
+        "change_status": "unchanged"
+      }
+    ],
+    "format": "CSV",
+    "raw_files_modified": false,
+    "reference": {
+      "file": "reference/stats19_data_guide.xlsx",
+      "sha256": "51b08606ef3dad1ae5d4c8726241b022fc8e4bbdc910ef0e5cc2fb92b054fc12",
+      "size_bytes": 85112
+    },
+    "elapsed_seconds": 0.95
+  },
+  "guide_sha256": "51b08606ef3dad1ae5d4c8726241b022fc8e4bbdc910ef0e5cc2fb92b054fc12",
+  "enriched_rows": 513801,
+  "parquet_validation": {
+    "collisions": {
+      "rows": 513801,
+      "schema_matches": true
+    },
+    "vehicles": {
+      "rows": 937265,
+      "schema_matches": true
+    },
+    "casualties": {
+      "rows": 652821,
+      "schema_matches": true
+    },
+    "collisions_enriched": {
+      "rows": 513801,
+      "schema_matches": true
+    }
+  },
+  "output_bytes": 107975683,
+  "elapsed_seconds": 59.49
+}

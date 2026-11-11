@@ -1,0 +1,26 @@
+collision_year,light_conditions_label,road_type_label,speed_limit_mph_clean,collision_count,fatal_or_serious_collision_count,reference_collision_count,reference_severe_collision_count,share_of_all_fatal_or_serious_percentage
+2021,Daylight,Single carriageway,30,33077,6880,101087,22758,30.231
+2022,Daylight,Single carriageway,30,33327,7322,106004,24935,29.364
+2023,Daylight,Single carriageway,30,31401,7048,104258,24960,28.237
+2024,Daylight,Single carriageway,30,29195,6741,100927,25069,26.89
+2025,Daylight,Single carriageway,30,29048,7139,101525,26644,26.794
+2021,Daylight,Single carriageway,60,7793,2655,101087,22758,11.666
+2022,Daylight,Single carriageway,60,8152,2860,106004,24935,11.47
+2023,Daylight,Single carriageway,60,8262,2922,104258,24960,11.707
+2024,Daylight,Single carriageway,60,8267,2946,100927,25069,11.752
+2025,Daylight,Single carriageway,60,8251,3075,101525,26644,11.541
+2021,Darkness - lights lit,Single carriageway,30,10065,2625,101087,22758,11.534
+2022,Darkness - lights lit,Single carriageway,30,10763,2818,106004,24935,11.301
+2023,Darkness - lights lit,Single carriageway,30,10441,2852,104258,24960,11.426
+2024,Darkness - lights lit,Single carriageway,30,9699,2780,100927,25069,11.089
+2025,Darkness - lights lit,Single carriageway,30,9195,2742,101525,26644,10.291
+2021,Daylight,Single carriageway,20,7677,1414,101087,22758,6.213
+2022,Daylight,Single carriageway,20,8338,1648,106004,24935,6.609
+2023,Daylight,Single carriageway,20,9047,1758,104258,24960,7.043
+2024,Daylight,Single carriageway,20,9814,2141,100927,25069,8.54
+2025,Daylight,Single carriageway,20,10710,2475,101525,26644,9.289
+2021,Daylight,Single carriageway,40,3527,886,101087,22758,3.893
+2022,Daylight,Single carriageway,40,3727,1019,106004,24935,4.087
+2023,Daylight,Single carriageway,40,3774,1063,104258,24960,4.259
+2024,Daylight,Single carriageway,40,3697,1066,100927,25069,4.252
+2025,Daylight,Single carriageway,40,3757,1133,101525,26644,4.252

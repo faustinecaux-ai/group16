@@ -42,9 +42,9 @@ data/gold/dev/runs/<run_id>/
 ```
 
 Each layer has a `latest_successful.json` pointer. The pipeline pointer identifies
-an entire successful run. A failed update leaves the previous successful pointers
-available. Always inspect run status: the presence of old outputs does not mean
-the latest attempt succeeded.
+an entire successful run. Publication is atomic per layer pointer. A Gold failure can follow a successful
+Silver publication; the pipeline manifest identifies a consistent end-to-end run.
+Previously published outputs alone do not establish that the latest attempt passed.
 
 To use another source location or output root:
 
@@ -70,19 +70,18 @@ It does need the small Gold CSVs and associated reports at their recorded paths.
 For a different output root, pass `--gold /path/to/output/gold` to the rendering
 script, or set `STATS19_GOLD_DIR` before running the notebook.
 
-## 5. Understand CI and scheduled execution
+## 5. CI and production execution
 
-Git records code versions; GitHub hosts them. After the necessary files are pushed,
-GitHub Actions asks the VM runner to execute the small tests for a change to `dev`
-or a Pull Request targeting `dev`/`main`. Results appear in the Actions tab.
+The development workflow runs fixture tests on pushes to `dev`, same-repository
+pull requests targeting `dev`/`main`, and manual dispatch. Fork pull requests are
+excluded from the self-hosted test job. Production runs on `main` pushes or manual
+dispatch, using the VM's external snapshot. No periodic schedule is currently
+enabled, and the pipeline does not download new source releases.
 
-After the validated code reaches `main`, the production workflow runs the complete
-project using the VM's external input snapshot. It also defines a monthly schedule
-and supports a manual launch. Environment approvals and mandatory checks must be
-configured separately in GitHub; YAML files do not establish those protections.
-
-Local validation of workflow commands is not evidence of a GitHub-hosted run.
-No new source data is automatically downloaded by the schedule.
+Workflow definitions describe the commands and triggers. Repository protection
+and environment approvals depend on separate GitHub settings. A retained passed
+production manifest is execution evidence; it does not identify the triggering
+event or verify those settings.
 
 ## 6. Interpret the profile results
 

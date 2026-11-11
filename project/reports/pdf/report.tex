@@ -4,7 +4,9 @@
 \usepackage[utf8]{inputenc}
 \usepackage[margin=20mm]{geometry}
 \usepackage{graphicx,booktabs,array,xcolor,fancyhdr}
+\usepackage[font=small,labelfont=bf,hypcap=false]{caption}
 \usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={A Trusted Silver Layer for Great Britain Road Collision Analysis},pdfauthor={Faustine Caux and Jules Gombert},pdfsubject={DAT535 project report, University of Stavanger}}
 \definecolor{accent}{RGB}{25,83,105}
 \pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small DAT535 --- STATS19 Data Pipeline}\fancyhead[R]{\small Group 16}\fancyfoot[C]{\thepage}
 \setlength{\headheight}{14pt}
@@ -16,6 +18,8 @@
 \begin{center}
 {\LARGE\bfseries A Trusted Silver Layer for Great Britain\\[4pt] Road Collision Analysis}\par
 {\large Bronze--Silver--Gold batch processing with PySpark}\par
+\textbf{Faustine Caux and Jules Gombert}\\[3pt]
+University of Stavanger\\[3pt]
 Group 16 \quad | \quad DAT535 \quad | \quad 11 November 2026
 \end{center}
 \heading{1. Problem, data and project scope}
@@ -65,6 +69,11 @@ Casualties & One casualty within a collision & \code{collision_index}, \code{cas
 
 A direct collision-level join of vehicles and casualties would multiply records: two vehicles and three casualties yield six joined rows. Instead, each child table is aggregated independently before joining its counts and attributes to collisions. The enriched table must retain exactly one row per collision. The original three tables remain available for other analytical questions, avoiding a flattened model tied to one report.
 
+\begin{center}
+\includegraphics[width=\linewidth,height=45mm,keepaspectratio]{../figures/silver_model.pdf}
+\captionof{figure}{Independent child aggregation preserves collision grain before enrichment.}
+\end{center}
+
 \subheading{Targeted transformations}
 Numeric CSV types are inferred, with collision identifiers, reference strings and time explicitly preserved as text. This protects leading zeroes and avoids interpreting an \code{HH:mm} value as a timestamp. Dates are parsed into Spark dates; month, hour and weekend fields are derived. Conversion failures and inconsistencies against source year and weekday are counted.
 
@@ -73,9 +82,6 @@ Official labels are added for seven categorical fields: collision severity, casu
 Age code $-1$ means ``Data missing or out of range''. Keeping it in a numerical average would bias the result; deleting the whole record would lose useful information. Silver therefore preserves source ages and adds nullable clean columns. Negative ages become null there, while unexpected negative codes trigger review. Zero is valid for casualties. For example, $-1,20,40$ becomes null, 20, 40: the recorded-age average is 30, with a denominator of two, and all three records remain.
 
 Similarly, a clean speed-limit column retains the six recognised public-highway limits, in mph. Missing or unknown source values remain traceable in the original field and become a separate missing group in Gold. Missing coordinates are counted rather than used as a blanket reason for rejection.
-
-\subheading{Why these choices matter}
-A null-only audit would miss populated special codes such as $-1$. Interpretation of the reference guide is therefore essential. Cleaning is deliberately limited to justified transformations: values already suitable for analysis are retained. This makes information loss explicit at the attribute level, while preserving reusable records and their source vocabulary.
 
 \newpage
 \heading{3. Quality evidence, tests and publication}
@@ -92,6 +98,11 @@ There were no unmatched collision relationships, casualty-to-vehicle orphans, pa
 
 The report also records limitations rather than hiding them: 142,240 driver ages and 14,106 casualty ages use the missing-age code; 53 longitudes and 53 latitudes are absent; three speed limits are coded missing. Recorded ages span 1--105 for drivers and 0--105 for casualties. These extrema are observations, not independent validation of each age. Coordinate range checks establish global plausibility, not geographic accuracy. No source records were removed.
 
+\begin{center}
+\includegraphics[width=\linewidth,height=43mm,keepaspectratio]{../figures/silver_age_quality.pdf}
+\captionof{figure}{Missing-age information is made explicit without removing records. Source age null counts are zero; populated missing codes explain the clean-column nulls.}
+\end{center}
+
 \subheading{Complementary checks and failure behaviour}
 Key checks enforce table grain. Foreign-key checks detect orphans. Comparing observed children with collision counters tests completeness relative to the parent's declarations. Checking enriched collision counts guards against join multiplication. These checks address different failure modes; none alone establishes complete data correctness.
 
@@ -99,63 +110,75 @@ Missing or duplicate keys and empty source tables cause failure. Relationship an
 
 Publication is atomic per pointer, not a transaction spanning every layer. Silver can advance before a later Gold failure. Consumers needing a consistent end-to-end snapshot should use the pipeline manifest and its run identifiers. Standalone stages should not run concurrently against shared outputs.
 
-\subheading{Tests and observed execution}
-The saved test evidence records \textbf{17 successful tests}. Tiny fixtures exercise identifier preservation, keys, guide decoding, date parsing, missing ages, enrichment grain, overlapping vehicle groups, source changes, analytical denominators and publication. In the failed-update integration test, a vehicle is removed: Silver requires review, Gold is skipped and the previous validated Silver/Gold pointers remain unchanged. Tests require the small versioned guide but no large raw CSVs.
-
-The reference full local run took 81.37 seconds: Bronze 0.95 s, Silver 59.49 s and Gold 19.48 s, plus orchestration overhead. A retained production-directory manifest, \code{20261110T180208676518Z}, also reports a passed full run (74.00 s). This is local operational evidence; the manifest alone does not establish which GitHub event launched it or confirm repository protection settings.
-
 \newpage
-\heading{4. Gold results: answering the analytical question}
-Gold contains 180 pooled lighting--road-type--speed-limit profiles and 803 observed annual profile combinations. Together with monthly, hourly, weather, lighting, road-type, speed-limit, weekend and vehicle-type tables, these make ten outputs. Exclusive summaries reconcile to Silver globally; annual profiles also reconcile within each year. Vehicle-type memberships overlap: a collision involving a car and cycle belongs to both groups, so those counts must not be summed.
-
-\textbf{Daylight / single carriageway / 30 mph accounts for the largest recorded severe caseload: 35,130 fatal or serious collisions, or 28.247\% of all severe collisions.} The five leading profiles contain 78,008 severe collisions, representing 62.725\% of the total. Across the snapshot, 124,366 of 513,801 collisions are fatal or serious (24.205\%).
+\heading{4. Silver validation and execution evidence}
+\subheading{Tests for the model and its quality gates}
+The saved test evidence records \textbf{17 successful tests}. Small synthetic fixtures and temporary directories make the suite independent of the large CSVs. The versioned official guide is its only source-data dependency. Tests address record meaning, relational structure and failure behaviour:
 
 \begin{center}\small
-\begin{tabular}{p{70mm}rrr}
-\toprule Profile (all on single carriageways) & Severe cases & Within profile & Share of severe\\\midrule
-Daylight / 30 mph & 35,130 & 22.512\% & 28.247\%\\
-Daylight / 60 mph & 14,458 & 35.502\% & 11.625\%\\
-Darkness, lights lit / 30 mph & 13,817 & 27.544\% & 11.110\%\\
-Daylight / 20 mph & 9,436 & 20.699\% & 7.587\%\\
-Daylight / 40 mph & 5,167 & 27.957\% & 4.155\%\\\bottomrule
+\begin{tabular}{p{40mm}p{112mm}}
+\toprule Test area & Behaviour checked\\\midrule
+Identifiers and grain & Leading zeroes and time text survive CSV loading; missing and duplicate keys are detected at the correct grain.\\
+Codes and preparation & Guide-derived severity lists stay distinct; unknown codes are retained; clean ages exclude negative codes; invalid dates and unknown speeds are handled.\\
+Enrichment & Two vehicles and three casualties produce one enriched collision with the expected child counts, rather than six joined rows.\\
+Publication and lineage & Failed and review-required runs preserve successful pointers; Gold refuses unvalidated Silver; Bronze detects input changes.\\
+End-to-end analysis & Totals reconcile; vehicle memberships are deduplicated; pooled and annual profiles use the correct reference populations.\\\bottomrule
 \end{tabular}\end{center}
 
-The leading profile's within-profile severe proportion, 22.512\%, is below the overall 24.205\%. Its share of all collisions is 30.371\%, compared with 28.247\% of severe cases: a gap of $-2.124$ percentage points. Its large severe caseload accompanies a large recorded collision population.
+The failed-update integration test removes one vehicle from a previously valid fixture. Silver detects the inconsistency and requires review; Gold is skipped, and the previous Silver and Gold pointers remain unchanged. Expected failure messages in this test are successful detection, rather than a failing suite. This provides stronger evidence than checking only a valid example.
 
-By contrast, darkness without lighting / single carriageway / 60 mph contains 5,006 severe cases, with 37.125\% classified severe within the profile. Its shares of all collisions and severe cases are 2.624\% and 4.025\%, respectively. It has a higher severe proportion but a smaller absolute caseload. This illustrates why counts and proportions answer different questions.
+\subheading{Execution and performance choices}
+The reference development run took 81.37 s: Bronze 0.95 s, Silver 59.49 s and Gold 19.48 s, plus orchestration overhead. A retained production manifest also reports a passed full run (74.00 s). Silver dominates the observed duration because it performs repeated audits, relationship checks and validated writes. These are observations from the VM, not service-level guarantees.
 
+Transformations use built-in DataFrame operations; the monthly Gold summary uses Spark SQL. Source frames are cached for repeated audits, joins and writes, then unpersisted. Eight shuffle partitions are a small-VM starting point. Saved plans expose aggregations, scans, joins and shuffles. Silver avoids excessive year/month directory partitions at this volume; small Gold tables use one Parquet file each.
+
+A separate experiment compares the same three-column yearly aggregation on CSV and Silver Parquet. An explicit CSV schema, no Spark cache and alternating format order make the comparison more interpretable. All query results match:
 \begin{center}
-\includegraphics[width=0.94\linewidth,height=57mm,keepaspectratio]{../figures/profile_years.png}
-\end{center}
-\textbf{The same top five profiles retain ranks 1--5 in the same order in every year from 2021 to 2025.} The leading profile has a negative severe-minus-all share gap in all five years; the unlit 60 mph comparison has a positive gap in all five. Each year uses its own denominator. This supports descriptive consistency within the observed period, rather than independent validation. Profiles were selected using the pooled data, and reporting changes remain relevant.
-
-An analyst can use these groups to select local investigations, then examine locations, traffic exposure and infrastructure context. These results cannot rank risk per kilometre or determine whether changing lighting or speed limits would prevent severe collisions.
-
-\newpage
-\heading{5. Performance, delivery and critical reflection}
-\subheading{Spark implementation and measured performance}
-Transformations use built-in DataFrame operations; the monthly summary uses Spark SQL. Python row UDFs are unnecessary. Source frames are cached because audits, joins and writes reuse them, then unpersisted. Eight shuffle partitions are a small-VM starting point rather than a demonstrated optimum. Saved plans expose aggregations, scans, joins and shuffles. Silver is not partitioned into many year/month directories because this snapshot is modest; small Gold tables use one Parquet file each.
-
-A separate experiment compares the same three-column yearly aggregation on CSV and Parquet. It uses an explicit CSV schema, no Spark cache and three trials in alternating format order. Query results match in every trial.
-\begin{center}
-\begin{tabular}{lrrr r}
+\begin{tabular}{lrrrr}
 \toprule Format & Trial 1 (s) & Trial 2 (s) & Trial 3 (s) & Median (s)\\\midrule
 CSV & 6.0336 & 1.0380 & 0.7430 & 1.0380\\
 Parquet & 1.4044 & 0.3758 & 0.2923 & 0.3758\\\bottomrule
 \end{tabular}\end{center}
-The Parquet plan shows a batched, three-column scan. Both formats use partial aggregation and a shuffle. These measurements support Parquet for this workload, but uncontrolled JVM warm-up, OS page cache and VM load prevent a general speedup or scalability claim. The benchmark references an earlier validated run on the same input snapshot. An exit-137 failure during concurrent Spark activity also motivated sequential runs and conservative driver-memory settings on the 8 GB VM.
+The Parquet plan shows a batched three-column scan; both formats use partial aggregation and a shuffle. Uncontrolled JVM warm-up, OS page cache and VM load prevent a general speedup claim. The benchmark references an earlier validated run on the same snapshot. A killed process during concurrent Spark activity motivated sequential runs with conservative memory settings on the 8 GB VM.
 
+\newpage
+\heading{5. Gold: a focused application of validated Silver}
+Gold demonstrates the analytical value of Silver through 180 pooled profiles and 803 observed annual profile combinations. Monthly, hourly, weather, lighting, road-type, speed-limit, weekend and vehicle-type summaries complete the ten outputs. Exclusive summaries reconcile to Silver globally and, for annual profiles, within each year. Vehicle-type groups overlap and cannot be summed into an overall total.
+
+\textbf{Daylight / single carriageway / 30 mph accounts for the largest severe caseload: 35,130 fatal or serious collisions, or 28.247\% of all severe collisions.} The five leading profiles contain 78,008 severe cases (62.725\%). Across the snapshot, 124,366 of 513,801 recorded collisions are fatal or serious (24.205\%).
+
+\begin{center}
+\includegraphics[width=\linewidth,height=67mm,keepaspectratio]{../figures/report_profiles.pdf}
+\captionof{figure}{Absolute caseload and within-profile severity answer different questions. The dashed line is the overall severe proportion (24.205\%).}
+\end{center}
+The leading profile's within-profile severe proportion is 22.512\%, below the overall 24.205\%. Its share of all collisions is 30.371\%, compared with 28.247\% of severe cases: a gap of $-2.124$ percentage points. Its large caseload accompanies a large recorded collision population. Darkness without lighting / single carriageway / 60 mph has fewer severe cases (5,006), but a higher severe proportion (37.125\%). Its severe-case share exceeds its share of all collisions by 1.401 points. Neither comparison measures traffic exposure.
+
+\begin{center}
+\includegraphics[width=\linewidth,height=60mm,keepaspectratio]{../figures/report_profile_years.pdf}
+\captionof{figure}{Pooled leading profiles followed across years, using each year's severe-case total as the denominator.}
+\end{center}
+\textbf{The same five profiles retain ranks 1--5 in the same order every year from 2021 to 2025.} The leading profile has a negative severe-minus-all share gap in all five years; the unlit 60 mph comparison has a positive gap in all five. This is descriptive consistency within the observed period. Selection uses pooled data, and reporting changes remain relevant.
+
+An analyst can use these groups to select local investigations, then obtain location, traffic-exposure and infrastructure information. The outputs cannot rank risk per kilometre or determine the effect of changing lighting or speed limits. Gold serves as a concrete consumer of Silver, rather than replacing its reusable model with a single ranking.
+
+\newpage
+\heading{6. Delivery, limitations and conclusion}
 \subheading{CI/CD and operational delivery}
 The project is merged into \code{main} at commit \code{e79206d}. The development workflow runs fixture tests on pushes to \code{dev}, same-repository pull requests targeting \code{dev}/\code{main}, and manual dispatch. Fork pull requests are excluded from the self-hosted test job. Test logs are retained as artifacts; legacy labs remain optional manual jobs.
 
-The current production workflow runs on pushes to \code{main} or manual dispatch, executes tests followed by Bronze--Silver--Gold against the VM's external snapshot, then generates presentation artifacts. It uses a persistent production directory and the \code{main} environment. \textbf{The current YAML has no monthly schedule.} Environment approvals and required branch checks depend on GitHub settings and cannot be inferred from YAML or the merge. A retained passed production manifest demonstrates a run in the production directory; remote run URLs and approval evidence would separately establish the hosting lifecycle.
+The current production workflow runs on pushes to \code{main} or manual dispatch, executes tests followed by Bronze--Silver--Gold against the VM's external snapshot, then generates presentation artifacts. It uses a persistent production directory and the \code{main} environment. \textbf{Execution is triggered by a main-branch push or manual dispatch; no periodic schedule is currently enabled.} Environment approvals and required branch checks depend on GitHub settings and cannot be inferred from YAML or the merge. The retained production manifest identifies run \code{20261110T180208676518Z}. It establishes a passed execution in the production directory; the manifest alone does not identify the triggering GitHub event or establish environment approvals.
+
+\subheading{Assessment artifacts and reproduction}
+The repository entry point links this report, the executed notebook, analytical results and Silver quality evidence. The PDF and editable LaTeX source form the project report. A versioned copy of the reference Silver JSON report allows its key counts, schemas and checks to be inspected without the raw data or a running Spark installation. The report's new model, missing-age and profile figures can be regenerated from versioned evidence using \code{scripts/render_report_figures.py}.
+
+Full reproduction additionally requires the original input snapshot and compatible Java/Spark/Python installations. Launchers accept external Bronze and output paths; the full pipeline manifest identifies a consistent run. Raw CSVs and generated layer datasets remain outside Git. Runtime directories are retained locally; long-term use requires a retention policy and monitoring of failed as well as successful attempts.
 
 \subheading{Reflection and conclusion}
 The strongest engineering choice is preserving relational grain while making publication depend on measured quality. Official-code interpretation prevents misleading age calculations; separate child aggregation prevents inflated collision counts. Keeping raw codes and nullable prepared fields improves traceability, although downstream users must still choose valid denominators.
 
 This is a full-snapshot batch pipeline on one VM, not an incremental or multi-node platform. Priorities for expansion are explicit schema contracts, archived input versions, source-change review, retention policies and resource sizing based on measured workloads. The guide reader is tied to the selected workbook layout. Unknown acquisition dates, reporting bias, unadjusted severity and missing traffic exposure remain material limitations.
 
-Silver provides reusable, structurally validated data; Gold demonstrates a defensible application. The leading severe-case groups are consistent across the five observed years, while case volume and within-profile severity remain distinct. The result supports targeted investigation with clear boundaries on interpretation.
+The central result is Silver: three reusable source-grain tables, collision-level enrichment and explicit evidence of structural consistency. Gold demonstrates their analytical use. The leading severe-case groups are consistent across the five observed years, while case volume and within-profile severity remain distinct. The result supports targeted investigation with clear boundaries on interpretation.
 
 {\footnotesize\textbf{Sources and evidence.} DfT, \href{https://www.gov.uk/government/statistical-data-sets/road-safety-open-data}{Road safety open data}; DfT, \href{https://www.gov.uk/government/publications/guide-to-severity-adjustments-for-reported-road-casualty-statistics}{Severity adjustment guidance}. Repository evidence: analytical results and performance manifests in the reports directory, the executed analysis notebook and per-run quality reports. Contains public sector information licensed under the Open Government Licence v3.0.}
 \end{document}
