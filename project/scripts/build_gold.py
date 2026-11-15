@@ -25,7 +25,11 @@ DIMENSIONS["collision_profiles_by_year"] = ["collision_year"] + DIMENSIONS["coll
 
 
 def summarise(collisions, dimensions):
-    """The percentage denominator is reported collisions in each group."""
+    """
+    Pour chaque groupe
+    Calcule des statistiques sur les collisions en regroupant les données
+    selon les dimensions choisies (par exemple : année, mois ou météo).
+    """
     grouped = collisions.groupBy(*dimensions).agg(
         F.count("*").alias("collision_count"),
         F.sum(F.col("collision_severity").isin(1, 2).cast("long")).alias("fatal_or_serious_collision_count"),
@@ -38,14 +42,15 @@ def summarise(collisions, dimensions):
 
 
 def summarise_vehicle_types(collisions, vehicles):
-    # A collision involving two cars must count once in the car group.
+    """Calcule les statistiques de collisions pour chaque type de véhicule."""
+    
     membership = vehicles.select("collision_index", "vehicle_type", "vehicle_type_label").distinct()
     return summarise(collisions.join(membership, "collision_index", "inner"),
                      ["vehicle_type", "vehicle_type_label"])
 
 
 def add_profile_reference_shares(profiles):
-    """Compare severe-case shares with shares of all recorded collisions, not traffic."""
+    """Ajoute les pourcentages permettant de comparer chaque profil aux totaux."""
     collision_share = F.col("collision_count") * 100.0 / F.col("reference_collision_count")
     severe_share = F.when(F.col("reference_severe_collision_count") > 0,
                          F.col("fatal_or_serious_collision_count") * 100.0 /
@@ -56,6 +61,7 @@ def add_profile_reference_shares(profiles):
 
 
 def summarise_profiles(collisions, total_severe, total_collisions):
+    """Calcule les statistiques des collisions selon plusieurs profils combinés."""
     profiles = (summarise(collisions, DIMENSIONS["collision_profiles"])
                 .withColumn("reference_collision_count", F.lit(total_collisions))
                 .withColumn("reference_severe_collision_count", F.lit(total_severe)))
@@ -63,6 +69,7 @@ def summarise_profiles(collisions, total_severe, total_collisions):
 
 
 def summarise_profiles_by_year(collisions):
+    """Calcule les statistiques des profils séparément pour chaque année."""
     reference = collisions.groupBy("collision_year").agg(
         F.count("*").alias("reference_collision_count"),
         F.sum(F.col("collision_severity").isin(1, 2).cast("long")).alias("reference_severe_collision_count"))
@@ -71,7 +78,7 @@ def summarise_profiles_by_year(collisions):
 
 
 def summarise_monthly_sql(collisions):
-    """Use Spark SQL for the calendar summary; other summaries use DataFrames."""
+    """Calcule les statistiques mensuelles des collisions avec une requête SQL."""
     collisions.createOrReplaceTempView("validated_stats19_collisions")
     return collisions.sparkSession.sql("""
         SELECT collision_year, month,
@@ -91,11 +98,30 @@ def summarise_monthly_sql(collisions):
 
 
 def run(silver_path, output, spark=None, run_id=None):
+    """
+    Exécute toute la construction de la couche Gold à partir des données Silver.
+
+    La fonction :
+    - charge le dernier jeu de données Silver validé ;
+    - vérifie la qualité et la cohérence des données en entrée ;
+    - calcule les différentes statistiques et agrégations Gold ;
+    - vérifie que les résultats correspondent aux données Silver ;
+    - enregistre les tables Gold aux formats Parquet et CSV ;
+    - recharge les fichiers pour vérifier que les données ont été correctement sauvegardées ;
+    - génère un rapport de qualité et publie le run s'il est valide.
+
+    Si une erreur survient, le run est marqué comme "failed" et n'est pas publié
+    comme dernière version réussie.
+    """
+    # Prépare les chemins du projet et crée un dossier spécifique à cette exécution.
     silver_path, output = Path(silver_path), Path(output)
     run_id = run_id or new_run_id()
     destination = output / "runs" / run_id
     destination.mkdir(parents=True, exist_ok=False)
+
     started = time.monotonic()
+
+    # Initialise le rapport qui contiendra les résultats et les informations de qualité.
     report = {"run_id": run_id, "status": "running", "tables": {},
               "severity_basis": "Reported severity, not severity-adjusted estimates",
               "denominator": "Reported collisions within each group; not traffic exposure",
@@ -103,45 +129,74 @@ def run(silver_path, output, spark=None, run_id=None):
     report["analytical_question"] = (
         "Which lighting, road-type and speed-limit profiles account for the largest "
         "numbers of fatal or serious reported collisions in Great Britain, 2021–2025?")
+
+    # Permet de savoir si cette fonction doit elle-même créer et arrêter Spark.
     owns_spark = spark is None
     cached = []
+
     try:
+        # Vérifie que le rapport Silver est valide avant de commencer la construction de Gold.
         silver_report = json.loads((silver_path / "quality_report.json").read_text())
         if silver_report["status"] != "passed":
             raise ValueError("Gold requires a passed Silver quality report")
+
         report["silver_run_id"] = silver_report["run_id"]
         report["silver_path"] = str(silver_path.resolve())
+
+        # Charge les données Silver : les collisions enrichies et les véhicules.
         spark = spark or create_spark("STATS19 Gold")
         collisions = spark.read.parquet(str(silver_path / "collisions_enriched")).cache()
         cached.append(collisions)
         vehicles = spark.read.parquet(str(silver_path / "vehicles"))
+
+        # Calcule les totaux (nombre de collisions, victimes, collisions mortelles ou graves) 
+        # de référence qui serviront à vérifier les résultats Gold.
         totals = collisions.agg(
             F.count("*").alias("collisions"), F.sum("number_of_casualties").alias("casualties"),
             F.sum(F.col("collision_severity").isin(1, 2).cast("long")).alias("fatal_or_serious")
         ).first().asDict()
+
+        # Vérifie que le nombre de collisions correspond bien au rapport Silver.
         if totals["collisions"] != silver_report["tables"]["collisions"]["rows"]:
             raise ValueError("Silver evidence and collision table row counts differ")
+
         report["source_totals"] = totals
+
+        # Calcule également les totaux par année pour les contrôles ultérieurs.
         report["source_year_totals"] = {str(row.collision_year): {
             "collisions": row.collisions, "casualties": row.casualties,
             "fatal_or_serious": row.fatal_or_serious} for row in collisions.groupBy("collision_year").agg(
                 F.count("*").alias("collisions"), F.sum("number_of_casualties").alias("casualties"),
                 F.sum(F.col("collision_severity").isin(1, 2).cast("long")).alias("fatal_or_serious")).collect()}
+
+        # Construit toutes les tables Gold : statistiques générales, mensuelles,
+        # profils de collisions et statistiques par type de véhicule.
         tables = {name: summarise(collisions, dims) for name, dims in DIMENSIONS.items()}
         tables["monthly"] = summarise_monthly_sql(collisions)
         tables["collision_profiles"] = summarise_profiles(collisions, totals["fatal_or_serious"], totals["collisions"])
         tables["collision_profiles_by_year"] = summarise_profiles_by_year(collisions)
         tables["vehicle_type"] = summarise_vehicle_types(collisions, vehicles)
+
+        # Parcourt chaque table Gold pour vérifier ses résultats et les enregistrer.
         for name, df in tables.items():
             dimensions = DIMENSIONS.get(name, ["vehicle_type", "vehicle_type_label"])
             rows = df.orderBy(*dimensions).limit(10001).collect()
+
+            # Vérifie que la table contient des résultats et qu'elle ne dépasse pas 10 000 lignes.
             if not rows or len(rows) > 10000:
                 raise ValueError(f"Unexpected Gold summary size: {name}")
+
+            # Recalcule les totaux de chaque table pour les comparer aux données Silver.
             observed = {"collisions": sum(r.collision_count for r in rows),
                         "casualties": sum(r.casualty_count for r in rows),
                         "fatal_or_serious": sum(r.fatal_or_serious_collision_count for r in rows)}
+
+            # Vérifie que les agrégations n'ont perdu ni ajouté de collisions ou de victimes.
+            # Exception : les groupes de véhicules peuvent se chevaucher.
             if name != "vehicle_type" and observed != totals:
                 raise ValueError(f"Gold totals do not reconcile: {name}")
+
+            # Vérifie aussi que les totaux des profils annuels correspondent à ceux de Silver.
             if name == "collision_profiles_by_year":
                 yearly = {}
                 for row in rows:
@@ -152,39 +207,59 @@ def run(silver_path, output, spark=None, run_id=None):
                     counts["fatal_or_serious"] += row.fatal_or_serious_collision_count
                 if yearly != report["source_year_totals"]:
                     raise ValueError("Yearly collision profiles do not reconcile to yearly Silver totals")
+
+            # Vérifie que les pourcentages calculés restent compris entre 0 et 100.
             if any(not 0 <= r.fatal_or_serious_percentage <= 100 for r in rows):
                 raise ValueError(f"Invalid percentage: {name}")
-            # These are intentionally small consumer tables; one file avoids tiny partitions.
+
+            # Enregistre la table au format Parquet, puis la recharge pour vérifier son contenu.
+            # coalesce(1) permet de produire un seul fichier de sortie.
             df.coalesce(1).write.mode("errorifexists").parquet(str(destination / name))
             reloaded = spark.read.parquet(str(destination / name))
             if reloaded.count() != len(rows):
                 raise ValueError(f"Gold Parquet count mismatch: {name}")
+
+            # Exporte également les résultats au format CSV.
             with (destination / f"{name}.csv").open("w", newline="", encoding="utf-8") as handle:
                 writer = csv.DictWriter(handle, fieldnames=df.columns)
                 writer.writeheader()
                 writer.writerows(row.asDict() for row in rows)
+
+            # Ajoute les résultats des vérifications au rapport de qualité.
             report["tables"][name] = {"rows": len(rows), "totals": observed,
                                       "reconciled_to_silver": name != "vehicle_type"}
             if name == "collision_profiles_by_year":
                 report["tables"][name]["reconciled_by_year"] = True
+
             print(f"Gold: {name}, {len(rows)} groups", flush=True)
+
+        # Enregistre dans un fichier texte le plan d'exécution de Spark pour la table monthly.
+        # Ce plan décrit les opérations que Spark prévoit d'effectuer pour calculer les statistiques,
+        # afin de pouvoir examiner son fonctionnement interne et analyser ses performances.
         with (destination / "monthly_plan.txt").open("w") as handle, redirect_stdout(handle):
             tables["monthly"].explain(mode="formatted")
+
+        # Toutes les vérifications sont passées : le run peut être marqué comme réussi.
         report["status"] = "passed"
+
     except Exception as error:
+        # En cas d'erreur, le run est marqué comme échoué et l'erreur est enregistrée.
         report["status"] = "failed"
         report["error"] = str(error)
         raise
+
     finally:
+        # Nettoie les ressources Spark et publie le rapport, même si le run échoue.
         report["elapsed_seconds"] = round(time.monotonic() - started, 2)
         for df in cached:
             df.unpersist()
         if owns_spark and spark is not None:
             spark.stop()
         publish_run(output, destination, report)
+
     return report
 
-
+"""Configure les chemins et lance la construction de la couche Gold."""
 if __name__ == "__main__":
     root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(description=__doc__)
