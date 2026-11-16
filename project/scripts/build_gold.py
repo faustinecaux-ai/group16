@@ -171,7 +171,14 @@ def run(silver_path, output, spark=None, run_id=None):
 
         # Construit toutes les tables Gold : statistiques générales, mensuelles,
         # profils de collisions et statistiques par type de véhicule.
-        tables = {name: summarise(collisions, dims) for name, dims in DIMENSIONS.items()}
+        dimensions_by_table = dict(DIMENSIONS)
+        if "weather_conditions_reconstructed" in collisions.columns:
+            dimensions_by_table.update({
+                "weather_reconstructed": ["weather_match_status", "weather_conditions_reconstructed"],
+                "weather_comparison": ["weather_match_status", "weather_conditions", "weather_conditions_reconstructed"],
+            })
+            report["weather_enrichment"] = silver_report["weather_enrichment"]
+        tables = {name: summarise(collisions, dims) for name, dims in dimensions_by_table.items()}
         tables["monthly"] = summarise_monthly_sql(collisions)
         tables["collision_profiles"] = summarise_profiles(collisions, totals["fatal_or_serious"], totals["collisions"])
         tables["collision_profiles_by_year"] = summarise_profiles_by_year(collisions)
@@ -179,7 +186,7 @@ def run(silver_path, output, spark=None, run_id=None):
 
         # Parcourt chaque table Gold pour vérifier ses résultats et les enregistrer.
         for name, df in tables.items():
-            dimensions = DIMENSIONS.get(name, ["vehicle_type", "vehicle_type_label"])
+            dimensions = dimensions_by_table.get(name, ["vehicle_type", "vehicle_type_label"])
             rows = df.orderBy(*dimensions).limit(10001).collect()
 
             # Vérifie que la table contient des résultats et qu'elle ne dépasse pas 10 000 lignes.

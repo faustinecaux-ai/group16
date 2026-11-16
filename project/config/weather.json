@@ -1,0 +1,12 @@
+{
+  "name": "London bounding box, full year 2023",
+  "start_date": "2023-01-01",
+  "end_date": "2023-12-31",
+  "latitude_min": 51.25,
+  "latitude_max": 51.75,
+  "longitude_min": -0.5,
+  "longitude_max": 0.25,
+  "grid_degrees": 0.25,
+  "max_distance_km": 30.0,
+  "strong_wind_kmh": 40.0
+}

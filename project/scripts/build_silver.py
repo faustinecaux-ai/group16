@@ -242,7 +242,7 @@ def enrich_collisions(collisions, vehicles, casualties):
     return collisions.join(vehicle_counts, "collision_index", "left").join(casualty_counts, "collision_index", "left")
 
 
-def run(bronze, output, spark=None, run_id=None, bronze_report=None):
+def run(bronze, output, spark=None, run_id=None, bronze_report=None, weather_bronze=None):
     """
     Exécute la construction et la validation de la couche Silver
     à partir des données de la couche Bronze.
@@ -452,6 +452,20 @@ def run(bronze, output, spark=None, run_id=None, bronze_report=None):
         # Agrégation des informations véhicules et victimes par accident.
         # Le résultat conserve une seule ligne par collision.
         enriched = enrich_collisions(collisions, vehicles, casualties)
+        weather_hourly = None
+        if weather_bronze is not None:
+            from weather_silver import load_weather, enrich_weather, audit_weather
+            weather_hourly, manifest = load_weather(spark, weather_bronze)
+            weather_hourly = weather_hourly.cache()
+            cached.append(weather_hourly)
+            enriched = enrich_weather(enriched, weather_hourly, manifest["config"]).cache()
+            cached.append(enriched)
+            pairs = [F.lit(v) for pair in mappings["weather_conditions"].items() for v in pair]
+            enriched = enriched.withColumn("weather_conditions_reconstructed_label",
+                         F.create_map(*pairs)[F.col("weather_conditions_reconstructed")])
+            report["weather_enrichment"] = audit_weather(enriched, manifest)
+            if not report["weather_enrichment"]["matched"]:
+                raise ValueError("Requested weather enrichment matched no collisions")
 
         # Sauvegarde du plan d'exécution Spark pour pouvoir examiner les jointures.
         with (destination / "enrichment_plan.txt").open("w") as handle, redirect_stdout(handle):
@@ -502,6 +516,10 @@ def run(bronze, output, spark=None, run_id=None, bronze_report=None):
         needs_review = needs_review or report["tables"]["collisions"][
             "speed_limit_quality"
         ]["unrecognised_values"]
+        if "weather_enrichment" in report:
+            # DST exclusions are expected; absent/invalid archive matches need review.
+            needs_review = needs_review or any(report["weather_enrichment"]["status_counts"].get(k, 0)
+                for k in ["missing_weather", "unusable_weather", "too_far"])
 
 
         #-------------------------------------------------------------
@@ -509,7 +527,10 @@ def run(bronze, output, spark=None, run_id=None, bronze_report=None):
         # Écriture des quatre DataFrames au format Parquet :
         # les trois tables détaillées et la table collisions enrichie.
         report["parquet_validation"] = {}
-        for name, df in {**frames, "collisions_enriched": enriched}.items():
+        outputs = {**frames, "collisions_enriched": enriched}
+        if weather_hourly is not None:
+            outputs["weather_hourly"] = weather_hourly
+        for name, df in outputs.items():
             print(f"Silver: writing {name}", flush=True)
 
             df.write.mode("errorifexists").parquet(str(destination / name))
@@ -586,6 +607,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bronze", type=Path, default=root / "data/bronze/stats19")
     parser.add_argument("--output", type=Path, default=root / "data/silver")
+    parser.add_argument("--weather-bronze", type=Path)
     args = parser.parse_args()
-    result = run(args.bronze.resolve(), args.output.resolve())
+    result = run(args.bronze.resolve(), args.output.resolve(), weather_bronze=args.weather_bronze)
     raise SystemExit(0 if result["status"] == "passed" else 2)

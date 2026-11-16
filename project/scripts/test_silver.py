@@ -11,6 +11,26 @@ from build_gold import summarise_vehicle_types, summarise_profiles, summarise_pr
 from run_project import run as run_project
 from ingest_bronze import run as run_bronze, compute_sha256
 from pipeline_common import create_spark, publish_run
+from weather_common import collision_clock, classify, cell_id
+from weather_silver import enrich_weather, load_weather
+
+
+class WeatherRuleTests(unittest.TestCase):
+    def test_dst_is_not_silently_guessed(self):
+        self.assertEqual(collision_clock("26/03/2023", "01:30")[1], "nonexistent_local_time")
+        self.assertEqual(collision_clock("29/10/2023", "01:30")[1], "ambiguous_local_time")
+        self.assertEqual(collision_clock("01/07/2023", "12:00")[0], 1688209200)
+        self.assertEqual(collision_clock("31/02/2023", "12:00")[1], "invalid_datetime")
+
+    def test_reconstruction_and_threshold(self):
+        self.assertEqual(classify(61, 39.9), 2)
+        self.assertEqual(classify(61, 40), 5)
+        self.assertEqual(classify(75, 50), 6)
+        self.assertEqual(classify(45, 50), 7)
+        self.assertEqual(classify(3, 0), 1)
+        self.assertIsNone(classify(1000, 0))
+        self.assertIsNone(classify(61, None))
+        self.assertEqual(cell_id(51.5, -.25), "206_-1")
 
 
 def make_bronze_fixture(directory):
@@ -58,6 +78,46 @@ class SilverTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.spark.stop()
+
+    def test_weather_join_preserves_grain_and_police_value(self):
+        collisions = self.spark.createDataFrame([
+            ("A", "01/01/2023", "12:20", 51.5, -.25, 1),
+            ("B", "01/01/2023", "12:20", 55., -.25, 1),
+            ("C", "29/10/2023", "01:30", 51.5, -.25, 1),
+            ("D", "01/01/2023", "12:20", 51.75, -.5, 1),
+            ("E", "01/01/2023", "12:20", 51.5, 0., 1),
+        ], "collision_index string, date_source string, time string, latitude double, longitude double, weather_conditions int")
+        from pyspark.sql import functions as F
+        collisions = collisions.withColumn("date", F.to_date("date_source", "dd/MM/yyyy"))
+        weather = self.spark.createDataFrame([("206_-1", 1672574400, 51.5, -.25, 61, 10., "hash"),
+                                              ("207_-2", 1672574400, 55., -.5, 61, 10., "hash")],
+            "weather_cell_id string, weather_hour_utc_epoch long, weather_latitude double, weather_longitude double, weather_wmo_code int, weather_wind_kmh double, weather_source_sha256 string")
+        config = dict(start_date="2023-01-01", end_date="2023-12-31", latitude_min=51.25,
+                      latitude_max=51.75, longitude_min=-.5, longitude_max=.25,
+                      grid_degrees=.25, max_distance_km=30., strong_wind_kmh=40.)
+        rows = {r.collision_index: r for r in enrich_weather(collisions, weather, config).collect()}
+        self.assertEqual(len(rows), 5)
+        self.assertEqual(rows["A"].weather_conditions, 1)
+        self.assertEqual(rows["A"].weather_conditions_reconstructed, 2)
+        self.assertFalse(rows["A"].weather_agrees)
+        self.assertEqual(rows["A"].weather_time_delta_minutes, 20)
+        self.assertEqual(rows["B"].weather_match_status, "outside_scope")
+        self.assertEqual(rows["C"].weather_match_status, "ambiguous_local_time")
+        self.assertEqual(rows["D"].weather_match_status, "too_far")
+        self.assertIsNone(rows["D"].weather_conditions_reconstructed)
+        self.assertEqual(rows["E"].weather_match_status, "missing_weather")
+        self.assertIsNone(rows["E"].weather_distance_km)
+        with self.assertRaisesRegex(ValueError, "not unique"):
+            enrich_weather(collisions, weather.union(weather), config)
+
+    def test_weather_source_corruption_blocks_silver(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "raw.json").write_text('{}')
+            (root / "manifest.json").write_text(json.dumps({"responses": [
+                {"file": "raw.json", "sha256": "wrong", "cell_id": "206_-1"}]}))
+            with self.assertRaisesRegex(ValueError, "checksum mismatch"):
+                load_weather(self.spark, root)
 
     # Vérifie qu'une collision peut être associée à plusieurs véhicules sans considérer leurs clés comme dupliquées.
     def test_vehicle_keys_allow_multiple_vehicles_per_collision(self):

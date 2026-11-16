@@ -1,5 +1,11 @@
 # DAT535 — STATS19 Road Collision Pipeline
 
+**Post-presentation Silver extension:** independent weather reconstruction from archived hourly ERA5, with UTC/DST handling, spatial matching, provenance, coverage and police/reanalysis comparison. See the [methodology](reports/weather_methodology.md). Run `python3 scripts/ingest_weather.py` once before the configured pipeline. The executed scope is the London bounding box in 2023; all other collisions remain explicitly outside scope. The original PDF and notebook describe the earlier baseline.
+
+[Weather extension results](reports/weather_results.md) · [Supplementary PDF](reports/pdf/weather_extension.pdf) · [Executed weather notebook](notebooks/weather_extension.ipynb) · [Weather quality evidence](reports/weather_quality.json)
+
+Validated extension run: `20261116T133604389268Z`. All 513,801 collisions retained; 25,689 of 25,695 in-scope collisions matched (99.977%). Agreement is 81.53% among 22,577 comparable police codes; six ambiguous local times are excluded. This is 5.000% national weather coverage. Regenerate evidence with `python scripts/render_weather_results.py`; execute the new notebook with `jupyter nbconvert --to notebook --execute --inplace notebooks/weather_extension.ipynb`.
+
 **Faustine Caux and Jules Gombert · Group 16 · University of Stavanger**
 
 [Project report (PDF)](reports/pdf/report.pdf) · [LaTeX source](reports/pdf/report.tex) · [Executed notebook](notebooks/analysis.ipynb) · [Analytical results](reports/results.md)

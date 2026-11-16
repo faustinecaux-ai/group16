@@ -40,6 +40,13 @@ jobs:
           set -euo pipefail
           bash project/scripts/run_tests.sh 2>&1 | tee "$RUNNER_TEMP/stats19-tests.log"
 
+      - name: Acquire or validate cached ERA5 weather Bronze
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 project/scripts/ingest_weather.py --bronze "$STATS19_BRONZE_DIR" \
+            --output "$HOME/stats19-pipeline/weather-bronze"
+
       - name: Run Bronze to Silver to Gold
         shell: bash
         env:
@@ -48,6 +55,7 @@ jobs:
           set -euo pipefail
           bash project/scripts/run_project.sh --env prod \
             --bronze "$STATS19_BRONZE_DIR" --output-root "$STATS19_OUTPUT_ROOT" \
+            --weather-bronze "$HOME/stats19-pipeline/weather-bronze" \
             2>&1 | tee "$RUNNER_TEMP/stats19-pipeline.log"
 
       - name: Build analytical figures and summary
@@ -70,5 +78,8 @@ jobs:
             ${{ runner.temp }}/stats19-pipeline.log
             ${{ steps.paths.outputs.root }}/pipeline/runs/**/quality_report.json
             ${{ steps.paths.outputs.root }}/presentation/
+            ${{ steps.paths.outputs.root }}/silver/runs/**/quality_report.json
+            ${{ steps.paths.outputs.root }}/gold/runs/**/weather_comparison.csv
+            ${{ steps.paths.outputs.root }}/gold/runs/**/weather_reconstructed.csv
           retention-days: 30
           if-no-files-found: warn

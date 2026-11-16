@@ -1,0 +1,8 @@
+weather_match_status,weather_conditions_reconstructed,collision_count,fatal_or_serious_collision_count,casualty_count,fatal_casualty_count,serious_casualty_count,mean_vehicles_involved,fatal_or_serious_percentage
+ambiguous_local_time,,6,0,6,0,0,1.5,0.0
+matched,1,20010,3350,23334,111,3385,1.8308345827086456,16.742
+matched,2,5556,856,6389,26,857,1.8029157667386608,15.407
+matched,3,91,18,106,2,16,1.7142857142857142,19.78
+matched,4,17,3,22,1,2,1.8823529411764706,17.647
+matched,5,15,1,18,0,1,1.7333333333333334,6.667
+outside_scope,,488106,120138,622946,7893,124750,1.824173437736885,24.613

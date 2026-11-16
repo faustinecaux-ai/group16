@@ -11,7 +11,7 @@ import build_gold
 from pipeline_common import create_spark, new_run_id, publish_run
 
 
-def run(bronze, silver, gold, operations, spark=None):
+def run(bronze, silver, gold, operations, spark=None, weather_bronze=None):
     bronze, silver, gold, operations = map(Path, [bronze, silver, gold, operations])
     operations.mkdir(parents=True, exist_ok=True)
     with (operations / ".pipeline.lock").open("w") as lock:
@@ -29,7 +29,7 @@ def run(bronze, silver, gold, operations, spark=None):
             report["stages"]["bronze"] = ingest_bronze.run(bronze, operations / "bronze", run_id)
             spark = spark or create_spark("STATS19 End-to-End")
             report["stages"]["silver"] = build_silver.run(
-                bronze, silver, spark, run_id, report["stages"]["bronze"])
+                bronze, silver, spark, run_id, report["stages"]["bronze"], weather_bronze)
             if report["stages"]["silver"]["status"] != "passed":
                 raise ValueError("Silver needs review; Gold was not run")
             report["stages"]["gold"] = build_gold.run(silver / "runs" / run_id, gold, spark, run_id)
@@ -53,6 +53,7 @@ if __name__ == "__main__":
     parser.add_argument("--env", choices=["dev", "prod"], default="dev")
     parser.add_argument("--bronze", type=Path, help="Override the shared input snapshot")
     parser.add_argument("--output-root", type=Path, help="Override all outputs, e.g. for tests")
+    parser.add_argument("--weather-bronze", type=Path, help="Override offline weather archive")
     args = parser.parse_args()
     settings = json.loads((root / "config" / f"{args.env}.json").read_text())
     bronze = args.bronze or root / settings["bronze"]
@@ -60,4 +61,5 @@ if __name__ == "__main__":
         silver, gold, operations = [args.output_root / name for name in ["silver", "gold", "pipeline"]]
     else:
         silver, gold, operations = [root / settings[name] for name in ["silver", "gold", "pipeline"]]
-    run(bronze, silver, gold, operations)
+    weather = args.weather_bronze or (root / settings["weather_bronze"] if settings.get("weather_bronze") else None)
+    run(bronze, silver, gold, operations, weather_bronze=weather)

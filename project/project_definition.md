@@ -1,5 +1,7 @@
 # DAT535 — Project Definition
 
+Post-presentation extension: Silver also prepares independent hourly ERA5 weather, reconstructs a weather category without using police weather, and audits spatial/temporal coverage and disagreement. The implemented scope is a London bounding box during 2023. See [weather methodology](reports/weather_methodology.md) and `config/weather.json`; the national analytical scope below is retained.
+
 ## Great Britain Road Collision Data Pipeline
 
 The project follows the Bronze → Silver → Gold Medallion Architecture. Its main contribution is a trusted Silver layer, supported by a reproducible batch pipeline, quality evidence and a focused analytical output. This document defines the target design; the README records implementation status.

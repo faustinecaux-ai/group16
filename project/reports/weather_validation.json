@@ -1,0 +1,11 @@
+{
+  "pipeline_run_id": "20261116T133604389268Z",
+  "pipeline_status": "passed",
+  "elapsed_seconds": 93.33,
+  "tests": 21,
+  "test_elapsed_seconds": 38.627,
+  "test_status": "passed",
+  "notebook_executed": true,
+  "ci_yaml_parsed": true,
+  "ci_remote_execution": "not triggered"
+}
