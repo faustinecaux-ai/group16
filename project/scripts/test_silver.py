@@ -59,11 +59,13 @@ class SilverTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.spark.stop()
 
+    # Vérifie qu'une collision peut être associée à plusieurs véhicules sans considérer leurs clés comme dupliquées.
     def test_vehicle_keys_allow_multiple_vehicles_per_collision(self):
         df = self.spark.createDataFrame([("A", 1), ("A", 2)], ["collision_index", "vehicle_reference"])
         self.assertEqual(audit_keys(df, df.columns),
                          {"rows": 2, "missing_keys": 0, "duplicate_key_excess": 0})
 
+    # Vérifie que les identifiants avec des zéros initiaux et les heures conservent leur format lors de la lecture CSV.
     def test_csv_preserves_time_and_leading_zero_identifiers(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "collisions.csv"
@@ -73,6 +75,7 @@ class SilverTests(unittest.TestCase):
                              ("001", "0002", "16:06"))
             self.assertEqual(row.collision_year, 2025)
 
+    # Vérifie que les clés manquantes ou dupliquées sont correctement détectées.
     def test_duplicate_and_missing_keys_are_detected(self):
         df = self.spark.createDataFrame([("A", 1), ("A", 1), (None, 2), (" ", 3)],
                                         ["collision_index", "vehicle_reference"])
@@ -80,12 +83,14 @@ class SilverTests(unittest.TestCase):
         self.assertEqual(metrics["duplicate_key_excess"], 1)
         self.assertEqual(metrics["missing_keys"], 2)
 
+    # Vérifie que le décodage conserve les codes inconnus et ne supprime aucune ligne.
     def test_decoding_preserves_unknown_codes_and_rows(self):
         df = self.spark.createDataFrame([(1,), (-1,), (999,)], ["weather_conditions"])
         rows = decode(df, ["weather_conditions"],
                       {"weather_conditions": {1: "Fine", -1: "Missing"}}).collect()
         self.assertEqual([(r[0], r[1]) for r in rows], [(1, "Fine"), (-1, "Missing"), (999, None)])
 
+    # Vérifie que les listes officielles de gravité des collisions et des victimes restent distinctes.
     def test_official_severity_lists_remain_distinct_from_enhanced_severity(self):
         guide = Path(__file__).resolve().parents[1] / "data/bronze/stats19/reference/stats19_data_guide.xlsx"
         mappings = read_code_lists(guide)
@@ -93,6 +98,7 @@ class SilverTests(unittest.TestCase):
         self.assertIn(5, mappings["enhanced_casualty_severity"])
         self.assertNotIn(5, mappings["casualty_severity"])
 
+    # Vérifie que les âges inconnus sont exclus des moyennes sans supprimer les enregistrements.
     def test_unknown_ages_do_not_bias_an_average_or_remove_records(self):
         df = self.spark.createDataFrame([(1, -1), (2, 0), (3, 40), (4, 105), (5, None), (6, -2)],
                                         ["id", "age_of_casualty"])
@@ -108,10 +114,12 @@ class SilverTests(unittest.TestCase):
         average = cleaned.selectExpr("avg(age_of_casualty_clean)").first()[0]
         self.assertAlmostEqual(average, 145 / 3)
 
+    # Vérifie que l'audit détecte les valeurs NULL et les chaînes vides ou contenant uniquement des espaces.
     def test_missing_field_audit_counts_nulls_and_blank_strings(self):
         df = self.spark.createDataFrame([(None, None), (" ", 20), ("A", 0)], ["key", "age"])
         self.assertEqual(audit_fields(df, ["key", "age"]), {"key": 2, "age": 1})
 
+    # Vérifie que les dates et heures invalides ainsi que les limitations de vitesse inconnues sont correctement traitées.
     def test_calendar_parsing_and_unknown_speed_limits(self):
         df = self.spark.createDataFrame([
             ("29/02/2024", "23:59", 30), ("29/02/2023", "24:00", -1),
@@ -125,6 +133,7 @@ class SilverTests(unittest.TestCase):
         self.assertEqual(rows[2].hour, 0)
         self.assertIsNone(rows[2].speed_limit_mph_clean)
 
+    # Vérifie que l'agrégation des véhicules et des victimes évite de multiplier les lignes d'une collision.
     def test_two_vehicles_three_casualties_do_not_multiply_collisions(self):
         collisions = self.spark.createDataFrame([("A",)], ["collision_index"])
         vehicles = self.spark.createDataFrame([("A", 20), ("A", 40)],
@@ -137,6 +146,7 @@ class SilverTests(unittest.TestCase):
         self.assertEqual(rows[0].mean_recorded_driver_age, 30)
         self.assertEqual((rows[0].fatal_casualty_count, rows[0].serious_casualty_count, rows[0].slight_casualty_count), (1, 1, 1))
 
+    # Vérifie qu'un run échoué ou nécessitant une vérification ne remplace pas le dernier run valide.
     def test_failed_publication_preserves_previous_pointer(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory)
@@ -146,6 +156,7 @@ class SilverTests(unittest.TestCase):
                 self.assertFalse(publish_run(output, output / status, {"run_id": status, "status": status}))
                 self.assertEqual((output / "latest_successful.json").read_bytes(), previous)
 
+   # Vérifie que Gold refuse de s'exécuter lorsque les données Silver ne sont pas validées.
     def test_gold_refuses_unvalidated_silver(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -154,6 +165,7 @@ class SilverTests(unittest.TestCase):
                 run_gold(root, root / "gold", self.spark)
             self.assertFalse((root / "gold/latest_successful.json").exists())
 
+    # Vérifie qu'un véhicule n'est compté qu'une fois par type dans une collision, tout en autorisant plusieurs types par collision.
     def test_vehicle_groups_deduplicate_memberships_but_may_overlap(self):
         collisions = self.spark.createDataFrame([
             ("A", 2, 3, 0, 1, 2), ("B", 3, 1, 0, 0, 1)],
@@ -169,6 +181,7 @@ class SilverTests(unittest.TestCase):
         self.assertEqual(rows[1].fatal_or_serious_percentage, 100)
         self.assertEqual(sum(r.collision_count for r in rows.values()), 3)  # Overlap is explicit.
 
+    # Vérifie les statistiques des profils et la distinction entre les deux pourcentages de référence.
     def test_profile_counts_and_two_percentage_denominators(self):
         df = self.spark.createDataFrame([
             ("A", 2, 1, 0, 1, 1, 1, "Daylight", 6, "Single carriageway", 30),
@@ -190,6 +203,7 @@ class SilverTests(unittest.TestCase):
         self.assertAlmostEqual(rows[6].severe_minus_all_collision_share_pp, 16.667)
         self.assertIsNone(rows[6].speed_limit_mph_clean)  # Unknown speed is retained.
 
+    # Vérifie que la part des collisions graves reste indéfinie lorsqu'il n'y a aucune collision grave.
     def test_profile_overall_share_is_undefined_without_severe_collisions(self):
         df = self.spark.createDataFrame([
             ("A", 3, 1, 0, 0, 1, 1, "Daylight", 6, "Single carriageway", 30)],
@@ -202,6 +216,7 @@ class SilverTests(unittest.TestCase):
         self.assertEqual(row.share_of_all_collisions_percentage, 100)
         self.assertIsNone(row.severe_minus_all_collision_share_pp)
 
+    # Vérifie que les profils annuels utilisent les totaux de leur propre année comme références.
     def test_annual_profiles_use_each_year_as_the_reference_population(self):
         df = self.spark.createDataFrame([
             (2024, 2, 1, 0, 1, 1, 1, "Daylight", 6, "Single carriageway", 30),
@@ -221,6 +236,7 @@ class SilverTests(unittest.TestCase):
         self.assertEqual(rows[2024, 6].reference_collision_count, 3)
         self.assertAlmostEqual(rows[2025, 1].severe_minus_all_collision_share_pp, -66.667)
 
+    # Vérifie que Bronze détecte les modifications des fichiers sources et rejette les fichiers vides.
     def test_bronze_detects_changes_and_rejects_empty_inputs(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -241,6 +257,7 @@ class SilverTests(unittest.TestCase):
                 run_bronze(bronze, root / "outputs")
             self.assertEqual((root / "outputs/latest_successful.json").read_bytes(), previous)
 
+    # Vérifie le fonctionnement complet du pipeline et la conservation des résultats valides après une mise à jour incorrecte.
     def test_end_to_end_totals_and_failed_update_preserves_gold(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

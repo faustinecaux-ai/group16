@@ -107,6 +107,7 @@ def audit_keys(df, keys):
 
     Ces contrôles permettent de vérifier que chaque ligne peut être
     identifiée de manière unique dans son dataset.
+    Renvoit une dataframe python
     """
     missing = F.lit(False)
     for key in keys:
@@ -128,6 +129,7 @@ def decode(df, fields, mappings):
 
     Les colonnes contenant les codes d'origine sont conservées,
     ce qui permet de préserver les valeurs sources.
+    Retourne la data frame 
     """
     for field in fields:
         mapping = mappings[field]
@@ -145,6 +147,8 @@ def audit_fields(df, fields):
 
     Les différents comptages sont réalisés dans une seule opération
     Spark afin de limiter le nombre de calculs distribués.
+
+    retourne dico python avec le nombre pour chaque colone
     """
     return df.agg(*[
         F.sum((F.col(field).isNull() | (F.trim(F.col(field).cast("string")) == ""))
@@ -417,6 +421,10 @@ def run(bronze, output, spark=None, run_id=None, bronze_report=None):
         # Récupération des trois DataFrames Silver.
         collisions, vehicles, casualties = [frames[n] for n in KEYS]
 
+
+
+        #----------------------------------------------------------------
+
         # Vérification des relations entre les tables :
         # chaque véhicule et chaque victime doit correspondre à un accident existant.
         for name in ["vehicles", "casualties"]:
@@ -495,6 +503,9 @@ def run(bronze, output, spark=None, run_id=None, bronze_report=None):
             "speed_limit_quality"
         ]["unrecognised_values"]
 
+
+        #-------------------------------------------------------------
+
         # Écriture des quatre DataFrames au format Parquet :
         # les trois tables détaillées et la table collisions enrichie.
         report["parquet_validation"] = {}
@@ -529,6 +540,9 @@ def run(bronze, output, spark=None, run_id=None, bronze_report=None):
 
         # Statut final de l'exécution.
         report["status"] = "needs_review" if needs_review else "passed"
+
+
+    #-------------------------------------------------------------------
 
     except Exception as error:
         # En cas d'erreur bloquante, l'exécution est marquée comme échouée.
